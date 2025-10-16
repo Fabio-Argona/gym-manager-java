@@ -1,18 +1,29 @@
-version: '3.9'
+version: '3.8'
 
 services:
   postgres:
-    image: postgres:15
-    container_name: treino_abc_postgres
+    image: postgres:latest
+    container_name: treino-abc-postgres
     environment:
-      POSTGRES_USER: treinoabc
-      POSTGRES_PASSWORD: treinoabc123
-      POSTGRES_DB: treinoabcdb
+      POSTGRES_DB: treino_abc
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5433"
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    restart: always
+
+  backend:
+    build: .
+    container_name: treino-backend
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/treino_abc
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
 
 volumes:
   pgdata:
