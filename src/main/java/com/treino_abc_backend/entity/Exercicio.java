@@ -9,7 +9,8 @@ public class Exercicio {
 
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "BINARY(16)")
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+
     private UUID id;
 
     @Column(nullable = false)
