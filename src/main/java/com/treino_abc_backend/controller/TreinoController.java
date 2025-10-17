@@ -3,7 +3,6 @@ package com.treino_abc_backend.controller;
 import com.treino_abc_backend.dto.FichaTreinoDTO;
 import com.treino_abc_backend.dto.TreinoDTO;
 import com.treino_abc_backend.dto.TreinoInputDTO;
-import com.treino_abc_backend.entity.Exercicio;
 import com.treino_abc_backend.entity.TreinoExercicioAluno;
 import com.treino_abc_backend.service.TreinoService;
 import org.springframework.beans.factory.annotation.Autowired;
