@@ -35,8 +35,10 @@ public class AuthService {
 
     // Login
     public TokenResponseDTO login(String email, String password) {
+        System.out.println("[AUTH SERVICE] Iniciando login para: " + email);
+
         Aluno aluno = alunoRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Email não encontrado"));
 
         if (!passwordEncoder.matches(password, aluno.getPassword())) {
             throw new RuntimeException("Senha inválida");
@@ -52,6 +54,8 @@ public class AuthService {
         alunoDTO.setTelefone(aluno.getTelefone());
         alunoDTO.setDataNascimento(aluno.getDataNascimento());
         alunoDTO.setLogin(aluno.getLogin());
+
+        System.out.println("[AUTH SERVICE] Login concluído com sucesso");
 
         return new TokenResponseDTO(token, alunoDTO);
     }
