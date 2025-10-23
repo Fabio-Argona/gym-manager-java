@@ -4,16 +4,37 @@ import java.util.List;
 import java.util.UUID;
 
 public class TreinoGrupoDTO {
+
     private UUID id;
+    private UUID alunoId;
     private String nome;
     private List<TreinoExercicioDTO> exercicios;
 
+    //  Construtor padrão
+    public TreinoGrupoDTO() {}
+
+    //  Construtor completo
+    public TreinoGrupoDTO(UUID id, UUID alunoId, String nome) {
+        this.id = id;
+        this.alunoId = alunoId;
+        this.nome = nome;
+    }
+
+    //  Getters e Setters
     public UUID getId() {
         return id;
     }
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getAlunoId() {
+        return alunoId;
+    }
+
+    public void setAlunoId(UUID alunoId) {
+        this.alunoId = alunoId;
     }
 
     public String getNome() {
@@ -31,6 +52,4 @@ public class TreinoGrupoDTO {
     public void setExercicios(List<TreinoExercicioDTO> exercicios) {
         this.exercicios = exercicios;
     }
-
-    // Getters e Setters
 }
