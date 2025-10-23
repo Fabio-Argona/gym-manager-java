@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -42,6 +43,20 @@ public class AlunoController {
             return ResponseEntity.status(404).body(e.getMessage());
         }
     }
+
+    @PutMapping("/{id}/nome")
+    public ResponseEntity<?> atualizarNome(@PathVariable UUID id, @RequestBody Map<String, String> body) {
+        String novoNome = body.get("nome");
+
+        return alunoRepository.findById(id)
+                .map(aluno -> {
+                    aluno.setNome(novoNome);
+                    alunoRepository.save(aluno);
+                    return ResponseEntity.ok(Map.of("mensagem", "Nome atualizado com sucesso"));
+                })
+                .orElseGet(() -> ResponseEntity.status(404).body(Map.of("erro", "Aluno não encontrado")));
+    }
+
 
     // Deletar
     public String deletar(UUID id) {

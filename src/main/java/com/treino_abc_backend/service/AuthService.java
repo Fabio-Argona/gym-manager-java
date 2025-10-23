@@ -5,15 +5,20 @@ import com.treino_abc_backend.dto.TokenResponseDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.security.JwtUtil;
+import com.treino_abc_backend.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class AuthService {
 
     @Autowired
     private AlunoRepository alunoRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -59,5 +64,27 @@ public class AuthService {
 
         return new TokenResponseDTO(token, alunoDTO);
     }
+
+    public void enviarEmailRecuperacao(String email) {
+        Aluno aluno = alunoRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email não encontrado"));
+
+        String token = jwtUtil.generateToken(email, aluno.getCpf());
+
+        String link = "https://seuapp.com/resetar-senha?token=" + token;
+
+        emailService.enviar(email, "Recuperação de senha", "Clique aqui para redefinir: " + link);
+    }
+
+    public void redefinirSenha(String token, String novaSenha) {
+        String email = jwtUtil.extractEmail(token);
+
+        Aluno aluno = alunoRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Token inválido"));
+
+        aluno.setPassword(novaSenha);
+        alunoRepository.save(aluno);
+    }
+
 
 }
