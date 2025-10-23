@@ -19,12 +19,17 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    // Extrai email do token
+    //  Extrai o email (subject) do token
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Extrai qualquer claim do token
+    //  Metodo usado no controller para obter o email do aluno
+    public String extractUsername(String token) {
+        return extractEmail(token);
+    }
+
+    //  Extrai qualquer claim
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -37,19 +42,18 @@ public class JwtUtil {
                 .getBody();
     }
 
-    // Valida token (email deve corresponder ao subject)
+    //  Valida se o token está correto e não expirado
     public boolean validateToken(String token, UserDetails userDetails) {
         final String email = extractEmail(token);
         return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-
 
     private boolean isTokenExpired(String token) {
         final Date expirationDate = extractClaim(token, Claims::getExpiration);
         return expirationDate.before(new Date());
     }
 
-    // Gera token
+    //  Gera token com email e CPF como claim
     public String generateToken(String email, String cpf) {
         return Jwts.builder()
                 .setSubject(email)

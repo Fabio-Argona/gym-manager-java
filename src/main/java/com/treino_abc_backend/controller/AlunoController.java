@@ -57,7 +57,6 @@ public class AlunoController {
                 .orElseGet(() -> ResponseEntity.status(404).body(Map.of("erro", "Aluno não encontrado")));
     }
 
-
     // Deletar
     public String deletar(UUID id) {
         Aluno aluno = alunoRepository.findById(id)
@@ -66,8 +65,5 @@ public class AlunoController {
         alunoRepository.deleteById(id);
         return nome;
     }
-
-
-
 
 }
