@@ -12,37 +12,32 @@ import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.repository.TreinoExercicioAlunoRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class TreinoService {
 
-    @Autowired
-    private TreinoExercicioAlunoRepository treinoRepo;
-
-    @Autowired
-    private AlunoRepository alunoRepo;
-
-    @Autowired
-    private ExercicioRepository exercicioRepo;
-
-    @Autowired
-    private TreinoGrupoRepository grupoRepo;
-
     private final TreinoExercicioAlunoRepository treinoRepo;
+    private final AlunoRepository alunoRepo;
+    private final ExercicioRepository exercicioRepo;
+    private final TreinoGrupoRepository grupoRepo;
 
-    public TreinoService(TreinoExercicioAlunoRepository treinoRepo) {
+    public TreinoService(
+            TreinoExercicioAlunoRepository treinoRepo,
+            AlunoRepository alunoRepo,
+            ExercicioRepository exercicioRepo,
+            TreinoGrupoRepository grupoRepo
+    ) {
         this.treinoRepo = treinoRepo;
+        this.alunoRepo = alunoRepo;
+        this.exercicioRepo = exercicioRepo;
+        this.grupoRepo = grupoRepo;
     }
 
+    // Lista os grupos com exercícios do aluno
     public List<TreinoGrupoDTO> listarGruposComExercicios(UUID alunoId) {
         List<TreinoExercicioAluno> lista = treinoRepo.findByAlunoId(alunoId);
 
@@ -73,6 +68,7 @@ public class TreinoService {
         return new ArrayList<>(grupos.values());
     }
 
+    // Adiciona exercício a um grupo
     public TreinoExercicioAluno adicionar(UUID alunoId, UUID grupoId, UUID exercicioId, String diaSemana, Integer ordem, String observacao) {
         Aluno aluno = alunoRepo.findById(alunoId)
                 .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
@@ -94,7 +90,7 @@ public class TreinoService {
         return treinoRepo.save(treino);
     }
 
-
+    // Atualiza exercício de treino
     public TreinoExercicioAluno atualizar(UUID id, UUID exercicioId, String diaSemana, Integer ordem, String observacao) {
         TreinoExercicioAluno treino = treinoRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Treino não encontrado"));
@@ -110,10 +106,38 @@ public class TreinoService {
         return treinoRepo.save(treino);
     }
 
+    // Atualiza via DTO
+    public TreinoExercicioAluno atualizarViaDTO(UUID id, TreinoDTO dto) {
+        TreinoExercicioAluno treino = treinoRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Treino não encontrado"));
+
+        Exercicio exercicio = exercicioRepo.findById(dto.getExercicioId())
+                .orElseThrow(() -> new IllegalArgumentException("Exercício não encontrado"));
+
+        exercicio.setSeries(dto.getSeries());
+        exercicio.setRepMin(dto.getRepMin());
+        exercicio.setRepMax(dto.getRepMax());
+        exercicio.setPesoInicial(dto.getPesoInicial());
+        exercicioRepo.save(exercicio);
+
+        treino.setExercicio(exercicio);
+        treino.setDiaSemana(dto.getDiaSemana());
+        treino.setOrdem(dto.getOrdem());
+        treino.setObservacao(dto.getObservacao());
+
+        if (dto.getNomeExercicio() != null && !dto.getNomeExercicio().isBlank()) {
+            treino.setNomeExercicio(dto.getNomeExercicio());
+        }
+
+        return treinoRepo.save(treino);
+    }
+
+    // Lista todos os treinos do aluno
     public List<TreinoExercicioAluno> listarPorAluno(UUID alunoId) {
         return treinoRepo.findByAlunoId(alunoId);
     }
 
+    // Remove treino
     public void remover(UUID id) {
         if (!treinoRepo.existsById(id)) {
             throw new IllegalArgumentException("Treino não encontrado para remoção");
@@ -121,6 +145,7 @@ public class TreinoService {
         treinoRepo.deleteById(id);
     }
 
+    // Retorna ficha agrupada por dia da semana
     public Map<String, List<FichaTreinoDTO>> fichaPorAluno(UUID alunoId) {
         List<TreinoExercicioAluno> treinos = treinoRepo.findByAlunoId(alunoId);
 
@@ -134,45 +159,8 @@ public class TreinoService {
                                 treino.getExercicio().getRepMin(),
                                 treino.getExercicio().getRepMax(),
                                 treino.getExercicio().getPesoInicial(),
-
                                 treino.getObservacao()
                         ), Collectors.toList())
                 ));
     }
-
-
-
-    public TreinoExercicioAluno atualizarViaDTO(UUID id, TreinoDTO dto) {
-        TreinoExercicioAluno treino = treinoRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Treino não encontrado"));
-
-        Exercicio exercicio = exercicioRepo.findById(dto.getExercicioId())
-                .orElseThrow(() -> new IllegalArgumentException("Exercício não encontrado"));
-
-        // Atualiza os dados do exercício
-        exercicio.setSeries(dto.getSeries());
-        exercicio.setRepMin(dto.getRepMin());
-        exercicio.setRepMax(dto.getRepMax());
-        exercicio.setPesoInicial(dto.getPesoInicial());
-        exercicioRepo.save(exercicio);
-
-        // Atualiza os dados do treino
-        treino.setExercicio(exercicio);
-        treino.setDiaSemana(dto.getDiaSemana());
-        treino.setOrdem(dto.getOrdem());
-        treino.setObservacao(dto.getObservacao());
-
-        // Salva nome personalizado, se fornecido
-        if (dto.getNomeExercicio() != null && !dto.getNomeExercicio().isBlank()) {
-            treino.setNomeExercicio(dto.getNomeExercicio());
-        }
-
-        return treinoRepo.save(treino);
-    }
-
-
-
-
-
-
 }
