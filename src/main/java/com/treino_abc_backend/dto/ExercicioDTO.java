@@ -1,0 +1,90 @@
+package com.treino_abc_backend.dto;
+
+import java.util.UUID;
+
+public class ExercicioDTO {
+
+    private UUID id;
+    private String nome;
+    private String grupoMuscular;
+    private Integer series;
+    private Integer repMin;
+    private Integer repMax;
+    private Double pesoInicial;
+    private String observacao;
+    private UUID alunoId;
+
+    // Getters e Setters
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getGrupoMuscular() {
+        return grupoMuscular;
+    }
+
+    public void setGrupoMuscular(String grupoMuscular) {
+        this.grupoMuscular = grupoMuscular;
+    }
+
+    public Integer getSeries() {
+        return series;
+    }
+
+    public void setSeries(Integer series) {
+        this.series = series;
+    }
+
+    public Integer getRepMin() {
+        return repMin;
+    }
+
+    public void setRepMin(Integer repMin) {
+        this.repMin = repMin;
+    }
+
+    public Integer getRepMax() {
+        return repMax;
+    }
+
+    public void setRepMax(Integer repMax) {
+        this.repMax = repMax;
+    }
+
+    public Double getPesoInicial() {
+        return pesoInicial;
+    }
+
+    public void setPesoInicial(Double pesoInicial) {
+        this.pesoInicial = pesoInicial;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
+
+    public UUID getAlunoId() {
+        return alunoId;
+    }
+
+    public void setAlunoId(UUID alunoId) {
+        this.alunoId = alunoId;
+    }
+}
