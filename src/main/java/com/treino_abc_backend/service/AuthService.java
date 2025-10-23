@@ -60,7 +60,7 @@ public class AuthService {
         alunoDTO.setDataNascimento(aluno.getDataNascimento());
         alunoDTO.setLogin(aluno.getLogin());
 
-        System.out.println("[AUTH SERVICE] Login concluído com sucesso");
+        System.out.println("[AUTH SERVICE] Login concluído com sucesso ");
 
         return new TokenResponseDTO(token, alunoDTO);
     }
@@ -82,7 +82,7 @@ public class AuthService {
         Aluno aluno = alunoRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Token inválido"));
 
-        aluno.setPassword(novaSenha);
+        aluno.setPassword(passwordEncoder.encode(novaSenha));
         alunoRepository.save(aluno);
     }
 
