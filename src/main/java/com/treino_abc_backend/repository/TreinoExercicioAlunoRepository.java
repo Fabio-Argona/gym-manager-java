@@ -7,9 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TreinoExercicioAlunoRepository extends JpaRepository<TreinoExercicioAluno, UUID> {
-    List<TreinoExercicioAluno> findByGrupoId(UUID grupoId);
-
     List<TreinoExercicioAluno> findByAlunoId(UUID alunoId);
 }
-
-
