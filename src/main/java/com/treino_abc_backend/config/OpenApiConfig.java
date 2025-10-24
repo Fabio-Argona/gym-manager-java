@@ -12,7 +12,7 @@ public class OpenApiConfig {
     public OpenAPI treinoABCOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Treino ABC API")
+                        .title("Treino API")
                         .description("Documentação da API para gerenciamento de treinos personalizados")
                         .version("v1.0"));
     }

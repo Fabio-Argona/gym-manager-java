@@ -1,6 +1,5 @@
 package com.treino_abc_backend.controller;
 
-import com.treino_abc_backend.dto.TreinoDTO;
 import com.treino_abc_backend.dto.TreinoGrupoDTO;
 import com.treino_abc_backend.entity.Exercicio;
 import com.treino_abc_backend.repository.AlunoRepository;
@@ -34,7 +33,6 @@ public class TreinoController {
         this.alunoRepo = alunoRepo;
     }
 
-    //  Listar exercícios de um treino (por nome, se necessário)
     @GetMapping("/{treinoNome}")
     public ResponseEntity<List<Exercicio>> listarPorTreino(
             @RequestHeader("aluno-id") String alunoId,
@@ -43,7 +41,6 @@ public class TreinoController {
         return ResponseEntity.ok(exercicioService.getPorAluno(alunoId));
     }
 
-    //  Adicionar exercício a um treino
     @PostMapping("/{treinoNome}")
     public ResponseEntity<Exercicio> adicionar(
             @RequestHeader("aluno-id") String alunoId,
@@ -55,7 +52,6 @@ public class TreinoController {
         return ResponseEntity.ok(salvo);
     }
 
-    //  Remover exercício de um treino
     @DeleteMapping("/{treinoNome}/{id}")
     public ResponseEntity<Void> remover(
             @RequestHeader("aluno-id") String alunoId,
@@ -66,7 +62,6 @@ public class TreinoController {
         return ResponseEntity.ok().build();
     }
 
-    //  Listar grupos com exercícios do aluno logado (via token JWT)
     @GetMapping
     public ResponseEntity<?> listarTreinosDoAluno(@RequestHeader("Authorization") String authHeader) {
         try {

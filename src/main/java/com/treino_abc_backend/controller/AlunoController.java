@@ -28,20 +28,16 @@ public class AlunoController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // Listar todos
     @GetMapping
-    public ResponseEntity<?> listar() {
+    public ResponseEntity<?> listarTodos() {
         return ResponseEntity.ok(alunoService.listarTodos());
     }
 
-    // Buscar por ID
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable UUID id) {
-        try {
-            return ResponseEntity.ok(alunoService.buscarPorId(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+        return alunoRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(404).body((Aluno) Map.of("erro", "Aluno não encontrado")));
     }
 
     @PutMapping("/{id}/nome")
@@ -54,16 +50,16 @@ public class AlunoController {
                     alunoRepository.save(aluno);
                     return ResponseEntity.ok(Map.of("mensagem", "Nome atualizado com sucesso"));
                 })
-                .orElseGet(() -> ResponseEntity.status(404).body(Map.of("erro", "Aluno não encontrado")));
+                .orElse(ResponseEntity.status(404).body(Map.of("erro", "Aluno não encontrado")));
     }
 
-    // Deletar
-    public String deletar(UUID id) {
-        Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado para deletar."));
-        String nome = aluno.getNome();
-        alunoRepository.deleteById(id);
-        return nome;
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletar(@PathVariable UUID id) {
+        return alunoRepository.findById(id)
+                .map(aluno -> {
+                    alunoRepository.deleteById(id);
+                    return ResponseEntity.ok(Map.of("mensagem", "Aluno '" + aluno.getNome() + "' deletado com sucesso"));
+                })
+                .orElse(ResponseEntity.status(404).body(Map.of("erro", "Aluno não encontrado")));
     }
-
 }

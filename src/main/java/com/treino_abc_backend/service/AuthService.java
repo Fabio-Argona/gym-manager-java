@@ -5,28 +5,25 @@ import com.treino_abc_backend.dto.TokenResponseDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.security.JwtUtil;
-import com.treino_abc_backend.service.EmailService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class AuthService {
 
-    @Autowired
-    private AlunoRepository alunoRepository;
+    private final AlunoRepository alunoRepository;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private EmailService emailService;
+    public AuthService(AlunoRepository alunoRepository, EmailService emailService,
+                       PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.alunoRepository = alunoRepository;
+        this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    // Registro
     public Aluno register(Aluno aluno) {
         if (alunoRepository.existsByEmail(aluno.getEmail())) {
             throw new RuntimeException("Email já cadastrado: " + aluno.getEmail());
@@ -38,10 +35,7 @@ public class AuthService {
         return alunoRepository.save(aluno);
     }
 
-    // Login
     public TokenResponseDTO login(String email, String password) {
-        System.out.println("[AUTH SERVICE] Iniciando login para: " + email);
-
         Aluno aluno = alunoRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Email não encontrado"));
 
@@ -50,19 +44,7 @@ public class AuthService {
         }
 
         String token = jwtUtil.generateToken(aluno.getEmail(), aluno.getCpf());
-
-        AlunoDTO alunoDTO = new AlunoDTO();
-        alunoDTO.setId(aluno.getId());
-        alunoDTO.setNome(aluno.getNome());
-        alunoDTO.setCpf(aluno.getCpf());
-        alunoDTO.setEmail(aluno.getEmail());
-        alunoDTO.setTelefone(aluno.getTelefone());
-        alunoDTO.setDataNascimento(aluno.getDataNascimento());
-        alunoDTO.setLogin(aluno.getLogin());
-
-        System.out.println("[AUTH SERVICE] Login concluído com sucesso ");
-
-        return new TokenResponseDTO(token, alunoDTO);
+        return new TokenResponseDTO(token, toDTO(aluno));
     }
 
     public void enviarEmailRecuperacao(String email) {
@@ -70,7 +52,6 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Email não encontrado"));
 
         String token = jwtUtil.generateToken(email, aluno.getCpf());
-
         String link = "https://seuapp.com/resetar-senha?token=" + token;
 
         emailService.enviar(email, "Recuperação de senha", "Clique aqui para redefinir: " + link);
@@ -86,5 +67,15 @@ public class AuthService {
         alunoRepository.save(aluno);
     }
 
-
+    private AlunoDTO toDTO(Aluno aluno) {
+        AlunoDTO dto = new AlunoDTO();
+        dto.setId(aluno.getId());
+        dto.setNome(aluno.getNome());
+        dto.setCpf(aluno.getCpf());
+        dto.setEmail(aluno.getEmail());
+        dto.setTelefone(aluno.getTelefone());
+        dto.setDataNascimento(aluno.getDataNascimento());
+        dto.setLogin(aluno.getLogin());
+        return dto;
+    }
 }
