@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -75,4 +77,17 @@ public class TreinoController {
             return ResponseEntity.status(401).body("Token inválido ou aluno não encontrado");
         }
     }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> atualizarStatus(@PathVariable UUID id, @RequestBody Map<String, Boolean> payload) {
+        boolean novoStatus = payload.getOrDefault("ativo", true);
+
+        Optional<Exercicio> exercicioOpt = exercicioService.atualizarStatus(id, novoStatus);
+        if (exercicioOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(exercicioOpt.get());
+    }
+
 }

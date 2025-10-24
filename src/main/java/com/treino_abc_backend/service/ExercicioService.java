@@ -105,4 +105,13 @@ public class ExercicioService {
             throw new RuntimeException("Exercício deve ter um aluno associado.");
         }
     }
+
+    public Optional<Exercicio> atualizarStatus(UUID id, boolean ativo) {
+        Optional<Exercicio> exercicioOpt = repository.findById(id);
+        if (exercicioOpt.isEmpty()) return Optional.empty();
+
+        Exercicio exercicio = exercicioOpt.get();
+        exercicio.setAtivo(ativo);
+        return Optional.of(repository.save(exercicio));
+    }
 }
