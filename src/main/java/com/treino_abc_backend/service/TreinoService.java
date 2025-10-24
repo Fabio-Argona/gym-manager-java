@@ -1,17 +1,8 @@
 package com.treino_abc_backend.service;
 
-import com.treino_abc_backend.dto.FichaTreinoDTO;
-import com.treino_abc_backend.dto.TreinoDTO;
-import com.treino_abc_backend.dto.TreinoExercicioDTO;
-import com.treino_abc_backend.dto.TreinoGrupoDTO;
-import com.treino_abc_backend.entity.Aluno;
-import com.treino_abc_backend.entity.Exercicio;
-import com.treino_abc_backend.entity.TreinoExercicioAluno;
-import com.treino_abc_backend.entity.TreinoGrupo;
-import com.treino_abc_backend.repository.AlunoRepository;
-import com.treino_abc_backend.repository.ExercicioRepository;
-import com.treino_abc_backend.repository.TreinoExercicioAlunoRepository;
-import com.treino_abc_backend.repository.TreinoGrupoRepository;
+import com.treino_abc_backend.dto.*;
+import com.treino_abc_backend.entity.*;
+import com.treino_abc_backend.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -37,10 +28,8 @@ public class TreinoService {
         this.grupoRepo = grupoRepo;
     }
 
-    // Lista os grupos com exercícios do aluno
     public List<TreinoGrupoDTO> listarGruposComExercicios(UUID alunoId) {
         List<TreinoExercicioAluno> lista = treinoRepo.findByAlunoId(alunoId);
-
         Map<UUID, TreinoGrupoDTO> grupos = new LinkedHashMap<>();
 
         for (TreinoExercicioAluno t : lista) {
@@ -68,14 +57,11 @@ public class TreinoService {
         return new ArrayList<>(grupos.values());
     }
 
-    // Adiciona exercício a um grupo
     public TreinoExercicioAluno adicionar(UUID alunoId, UUID grupoId, UUID exercicioId, String diaSemana, Integer ordem, String observacao) {
         Aluno aluno = alunoRepo.findById(alunoId)
                 .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
-
         Exercicio exercicio = exercicioRepo.findById(exercicioId)
                 .orElseThrow(() -> new IllegalArgumentException("Exercício não encontrado"));
-
         TreinoGrupo grupo = grupoRepo.findById(grupoId)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo de treino não encontrado"));
 
@@ -90,11 +76,9 @@ public class TreinoService {
         return treinoRepo.save(treino);
     }
 
-    // Atualiza exercício de treino
     public TreinoExercicioAluno atualizar(UUID id, UUID exercicioId, String diaSemana, Integer ordem, String observacao) {
         TreinoExercicioAluno treino = treinoRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Treino não encontrado"));
-
         Exercicio exercicio = exercicioRepo.findById(exercicioId)
                 .orElseThrow(() -> new IllegalArgumentException("Exercício não encontrado"));
 
@@ -106,11 +90,9 @@ public class TreinoService {
         return treinoRepo.save(treino);
     }
 
-    // Atualiza via DTO
     public TreinoExercicioAluno atualizarViaDTO(UUID id, TreinoDTO dto) {
         TreinoExercicioAluno treino = treinoRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Treino não encontrado"));
-
         Exercicio exercicio = exercicioRepo.findById(dto.getExercicioId())
                 .orElseThrow(() -> new IllegalArgumentException("Exercício não encontrado"));
 
@@ -132,12 +114,10 @@ public class TreinoService {
         return treinoRepo.save(treino);
     }
 
-    // Lista todos os treinos do aluno
     public List<TreinoExercicioAluno> listarPorAluno(UUID alunoId) {
         return treinoRepo.findByAlunoId(alunoId);
     }
 
-    // Remove treino
     public void remover(UUID id) {
         if (!treinoRepo.existsById(id)) {
             throw new IllegalArgumentException("Treino não encontrado para remoção");
@@ -145,7 +125,6 @@ public class TreinoService {
         treinoRepo.deleteById(id);
     }
 
-    // Retorna ficha agrupada por dia da semana
     public Map<String, List<FichaTreinoDTO>> fichaPorAluno(UUID alunoId) {
         List<TreinoExercicioAluno> treinos = treinoRepo.findByAlunoId(alunoId);
 

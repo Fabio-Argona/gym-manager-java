@@ -1,11 +1,6 @@
 package com.treino_abc_backend.controller;
 
-import com.treino_abc_backend.dto.AlunoDTO;
-import com.treino_abc_backend.dto.AlunoLoginDTO;
-import com.treino_abc_backend.dto.AlunoRegisterDTO;
-import com.treino_abc_backend.dto.RecuperarSenhaDTO;
-import com.treino_abc_backend.dto.RedefinirSenhaDTO;
-import com.treino_abc_backend.dto.TokenResponseDTO;
+import com.treino_abc_backend.dto.*;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.security.JwtUtil;
 import com.treino_abc_backend.service.AuthService;
@@ -23,7 +18,6 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AlunoRegisterDTO dto) {
         try {
@@ -37,7 +31,6 @@ public class AuthController {
             aluno.setPassword(dto.getPassword());
 
             Aluno saved = authService.register(aluno);
-
             String token = jwtUtil.generateToken(saved.getEmail(), saved.getCpf());
 
             AlunoDTO alunoDTO = new AlunoDTO();
@@ -50,12 +43,10 @@ public class AuthController {
             alunoDTO.setLogin(saved.getLogin());
 
             return ResponseEntity.ok(new TokenResponseDTO(token, alunoDTO));
-
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AlunoLoginDTO dto) {
@@ -86,5 +77,4 @@ public class AuthController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 }

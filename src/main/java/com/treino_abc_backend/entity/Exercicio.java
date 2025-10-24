@@ -15,35 +15,26 @@ public class Exercicio {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
+    @Column(name = "grupo_muscular", nullable = false)
     private String grupoMuscular;
 
     @Column(nullable = false)
     private int series;
 
-    @Column(nullable = false)
+    @Column(name = "rep_min", nullable = false)
     private int repMin;
 
-    @Column(nullable = false)
+    @Column(name = "rep_max", nullable = false)
     private int repMax;
 
-    @Column(nullable = false)
+    @Column(name = "peso_inicial", nullable = false)
     private Double pesoInicial;
 
     @Column(length = 500)
     private String observacao;
 
-    @Column(nullable = false)
+    @Column(name = "aluno_id", nullable = false)
     private UUID alunoId;
-
-    // Getters e Setters
-    public UUID getAlunoId() {
-        return alunoId;
-    }
-
-    public void setAlunoId(UUID alunoId) {
-        this.alunoId = alunoId;
-    }
 
     public UUID getId() {
         return id;
@@ -52,6 +43,7 @@ public class Exercicio {
     public void setId(UUID id) {
         this.id = id;
     }
+
     public String getNome() {
         return nome;
     }
@@ -107,5 +99,12 @@ public class Exercicio {
     public void setObservacao(String observacao) {
         this.observacao = observacao;
     }
-}
 
+    public UUID getAlunoId() {
+        return alunoId;
+    }
+
+    public void setAlunoId(UUID alunoId) {
+        this.alunoId = alunoId;
+    }
+}

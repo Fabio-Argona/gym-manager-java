@@ -13,25 +13,29 @@ public class Aluno {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
+    @Column(nullable = false)
     private String nome;
 
     @Column(nullable = false, unique = true)
     private String cpf;
 
+    @Column(nullable = true)
     private String telefone;
 
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
 
+    @Column(nullable = true)
     private String login;
 
+    @Column(nullable = false)
     private String password;
 
-    private String role; // ROLE_USER, ROLE_ADMIN, etc.
-
-    // Getters and Setters
+    @Column(nullable = false)
+    private String role;
 
     public UUID getId() {
         return id;

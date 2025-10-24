@@ -1,19 +1,27 @@
 package com.treino_abc_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 
 public class AlunoRegisterDTO {
 
     private String nome;
+
     private String cpf;
+
     private String email;
+
     private String telefone;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonProperty("data_nascimento")
     private LocalDate dataNascimento;
 
     private String login;
+
+    @JsonProperty("senha")
     private String password;
 
     // Construtor padrão
@@ -32,7 +40,6 @@ public class AlunoRegisterDTO {
     }
 
     // Getters e Setters
-
     public String getNome() {
         return nome;
     }

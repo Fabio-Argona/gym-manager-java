@@ -20,7 +20,6 @@ public class ExercicioController {
 
     @GetMapping
     public ResponseEntity<List<Exercicio>> listar(@RequestHeader("aluno-id") String alunoId) {
-        // Lista apenas os exercícios do aluno logado
         return ResponseEntity.ok(service.getPorAluno(alunoId));
     }
 
@@ -39,7 +38,7 @@ public class ExercicioController {
         exercicio.setId(UUID.fromString(id));
         return service.atualizar(exercicio, UUID.fromString(alunoId))
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(403).build()); // 403 se tentar atualizar outro aluno
+                .orElse(ResponseEntity.status(403).build());
     }
 
     @DeleteMapping("/{id}")

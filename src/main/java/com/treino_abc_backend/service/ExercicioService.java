@@ -21,11 +21,21 @@ public class ExercicioService {
         return repository.findAll();
     }
 
+    public List<Exercicio> getPorAluno(String alunoId) {
+        UUID alunoUUID = UUID.fromString(alunoId);
+        return repository.findByAlunoId(alunoUUID);
+    }
+
     public Exercicio salvar(Exercicio exercicio) {
-        if (exercicio.getAlunoId() == null) {
-            throw new RuntimeException("Exercício deve ter um aluno associado.");
-        }
+        validarAluno(exercicio);
         return repository.save(exercicio);
+    }
+
+    public List<Exercicio> salvarTodos(List<Exercicio> exercicios) {
+        for (Exercicio e : exercicios) {
+            validarAluno(e);
+        }
+        return repository.saveAll(exercicios);
     }
 
     public Optional<Exercicio> atualizar(Exercicio novo, UUID alunoId) {
@@ -33,8 +43,6 @@ public class ExercicioService {
         if (existente.isEmpty()) return Optional.empty();
 
         Exercicio exercicio = existente.get();
-
-        // Verifica se o exercício pertence ao aluno
         if (!exercicio.getAlunoId().equals(alunoId)) {
             throw new RuntimeException("Você não pode alterar exercícios de outro aluno.");
         }
@@ -50,11 +58,6 @@ public class ExercicioService {
         return Optional.of(repository.save(exercicio));
     }
 
-    public List<Exercicio> getPorAluno(String alunoId) {
-        UUID alunoUUID = UUID.fromString(alunoId);
-        return repository.findByAlunoId(alunoUUID);
-    }
-
     public void deletar(String id, UUID alunoId) {
         Exercicio exercicio = repository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new RuntimeException("Exercício não encontrado."));
@@ -66,21 +69,8 @@ public class ExercicioService {
         repository.deleteById(exercicio.getId());
     }
 
-    public List<Exercicio> salvarTodos(List<Exercicio> exercicios) {
-        // Verifica se todos os exercícios têm alunoId
-        for (Exercicio e : exercicios) {
-            if (e.getAlunoId() == null) {
-                throw new RuntimeException("Todos os exercícios devem ter um aluno associado.");
-            }
-        }
-        return repository.saveAll(exercicios);
-    }
-
-
     public Exercicio adicionarAoTreino(Exercicio exercicio) {
-        if (exercicio.getAlunoId() == null) {
-            throw new RuntimeException("Exercício deve ter um aluno associado.");
-        }
+        validarAluno(exercicio);
         return repository.save(exercicio);
     }
 
@@ -88,5 +78,9 @@ public class ExercicioService {
         deletar(id, alunoId);
     }
 
-
+    private void validarAluno(Exercicio exercicio) {
+        if (exercicio.getAlunoId() == null) {
+            throw new RuntimeException("Exercício deve ter um aluno associado.");
+        }
+    }
 }
