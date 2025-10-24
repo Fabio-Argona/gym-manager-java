@@ -1,6 +1,7 @@
 package com.treino_abc_backend.service;
 
 import com.treino_abc_backend.entity.Exercicio;
+import com.treino_abc_backend.dto.TreinoGrupoDTO;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;

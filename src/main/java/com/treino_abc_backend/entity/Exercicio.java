@@ -121,4 +121,10 @@ public class Exercicio {
     public void setAlunoId(UUID alunoId) {
         this.alunoId = alunoId;
     }
+
+    @Transient
+    public UUID getGrupoId() {
+        return grupo != null ? grupo.getId() : null;
+    }
+
 }
