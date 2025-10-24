@@ -23,10 +23,8 @@ public class AlunoRegisterDTO {
 
     private String password;
 
-    // Construtor padrão
     public AlunoRegisterDTO() {}
 
-    // Construtor completo
     public AlunoRegisterDTO(String nome, String cpf, String email, String telefone,
                             LocalDate dataNascimento, String login, String password) {
         this.nome = nome;
@@ -38,7 +36,6 @@ public class AlunoRegisterDTO {
         this.password = password;
     }
 
-    // Getters e Setters
     public String getNome() {
         return nome;
     }

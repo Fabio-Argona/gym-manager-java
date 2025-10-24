@@ -2,7 +2,12 @@ package com.treino_abc_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.UUID;
+
 public class TreinoExercicioDTO {
+
+    @JsonProperty("grupo_id")
+    private UUID grupoId;
 
     @JsonProperty("nome")
     private String nomeExercicio;
@@ -23,10 +28,8 @@ public class TreinoExercicioDTO {
 
     private String observacao;
 
-    // Construtor padrão
     public TreinoExercicioDTO() {}
 
-    // Construtor completo
     public TreinoExercicioDTO(String nomeExercicio, String grupoMuscular, int series,
                               int repMin, int repMax, double pesoInicial, String observacao) {
         this.nomeExercicio = nomeExercicio;
@@ -38,7 +41,14 @@ public class TreinoExercicioDTO {
         this.observacao = observacao;
     }
 
-    // Getters e Setters
+    public UUID getGrupoId() {
+        return grupoId;
+    }
+
+    public void setGrupoId(UUID grupoId) {
+        this.grupoId = grupoId;
+    }
+
     public String getNomeExercicio() {
         return nomeExercicio;
     }

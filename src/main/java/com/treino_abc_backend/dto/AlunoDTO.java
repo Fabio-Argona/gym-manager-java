@@ -24,10 +24,8 @@ public class AlunoDTO {
 
     private String login;
 
-    // Construtor padrão
     public AlunoDTO() {}
 
-    // Construtor completo
     public AlunoDTO(UUID id, String nome, String cpf, String email, String telefone, LocalDate dataNascimento, String login) {
         this.id = id;
         this.nome = nome;
@@ -38,7 +36,6 @@ public class AlunoDTO {
         this.login = login;
     }
 
-    // Getters e Setters
     public UUID getId() {
         return id;
     }

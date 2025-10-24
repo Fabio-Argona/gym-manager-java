@@ -22,10 +22,8 @@ public class TreinoInputDTO {
 
     private String observacao;
 
-    // Construtor padrão
     public TreinoInputDTO() {}
 
-    // Construtor completo
     public TreinoInputDTO(UUID alunoId, UUID grupoId, UUID exercicioId, String diaSemana, Integer ordem, String observacao) {
         this.alunoId = alunoId;
         this.grupoId = grupoId;
@@ -35,7 +33,6 @@ public class TreinoInputDTO {
         this.observacao = observacao;
     }
 
-    // Getters e Setters
     public UUID getAlunoId() {
         return alunoId;
     }

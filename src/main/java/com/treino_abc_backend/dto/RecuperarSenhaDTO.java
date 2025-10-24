@@ -7,10 +7,8 @@ public class RecuperarSenhaDTO {
     @JsonProperty("email")
     private String email;
 
-    // Construtor padrão
     public RecuperarSenhaDTO() {}
 
-    // Construtor completo
     public RecuperarSenhaDTO(String email) {
         this.email = email;
     }
