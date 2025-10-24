@@ -21,7 +21,6 @@ public class AlunoRegisterDTO {
 
     private String login;
 
-    @JsonProperty("senha")
     private String password;
 
     // Construtor padrão

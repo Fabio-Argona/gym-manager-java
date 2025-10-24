@@ -7,7 +7,6 @@ public class AlunoLoginDTO {
     @JsonProperty("email")
     private String email;
 
-    @JsonProperty("senha")
     private String password;
 
     // Construtor padrão
