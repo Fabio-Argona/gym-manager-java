@@ -25,10 +25,13 @@ public class AuthService {
     }
 
     public Aluno register(Aluno aluno) {
-        if (alunoRepository.existsByEmail(aluno.getEmail())) {
-            throw new RuntimeException("Email já cadastrado: " + aluno.getEmail());
+        String normalizedEmail = aluno.getEmail().trim().toLowerCase();
+
+        if (alunoRepository.existsByEmail(normalizedEmail)) {
+            throw new RuntimeException("Email já cadastrado: " + normalizedEmail);
         }
 
+        aluno.setEmail(normalizedEmail);
         aluno.setPassword(passwordEncoder.encode(aluno.getPassword()));
         aluno.setRole("ROLE_USER");
 
@@ -36,11 +39,13 @@ public class AuthService {
     }
 
     public TokenResponseDTO login(String email, String password) {
-        Aluno aluno = alunoRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Email não encontrado"));
+        String normalizedEmail = email.trim().toLowerCase();
+
+        Aluno aluno = alunoRepository.findByEmail(normalizedEmail)
+                .orElseThrow(() -> new RuntimeException("Email não encontrado: " + normalizedEmail));
 
         if (!passwordEncoder.matches(password, aluno.getPassword())) {
-            throw new RuntimeException("Senha inválida");
+            throw new RuntimeException("Senha inválida para o email: " + normalizedEmail);
         }
 
         String token = jwtUtil.generateToken(aluno.getEmail(), aluno.getCpf());
@@ -48,20 +53,22 @@ public class AuthService {
     }
 
     public void enviarEmailRecuperacao(String email) {
-        Aluno aluno = alunoRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Email não encontrado"));
+        String normalizedEmail = email.trim().toLowerCase();
 
-        String token = jwtUtil.generateToken(email, aluno.getCpf());
+        Aluno aluno = alunoRepository.findByEmail(normalizedEmail)
+                .orElseThrow(() -> new RuntimeException("Email não encontrado: " + normalizedEmail));
+
+        String token = jwtUtil.generateToken(normalizedEmail, aluno.getCpf());
         String link = "https://seuapp.com/resetar-senha?token=" + token;
 
-        emailService.enviar(email, "Recuperação de senha", "Clique aqui para redefinir: " + link);
+        emailService.enviar(normalizedEmail, "Recuperação de senha", "Clique aqui para redefinir: " + link);
     }
 
     public void redefinirSenha(String token, String novaSenha) {
-        String email = jwtUtil.extractEmail(token);
+        String email = jwtUtil.extractEmail(token).trim().toLowerCase();
 
         Aluno aluno = alunoRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Token inválido"));
+                .orElseThrow(() -> new RuntimeException("Token inválido ou email não encontrado: " + email));
 
         aluno.setPassword(passwordEncoder.encode(novaSenha));
         alunoRepository.save(aluno);

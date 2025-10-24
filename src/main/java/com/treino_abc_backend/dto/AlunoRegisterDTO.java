@@ -15,13 +15,12 @@ public class AlunoRegisterDTO {
 
     private String telefone;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @JsonProperty("data_nascimento")
     private LocalDate dataNascimento;
 
     private String login;
 
-    @JsonProperty("senha")
     private String password;
 
     // Construtor padrão
