@@ -13,6 +13,10 @@ public class TreinoExercicioAluno {
     private UUID id;
 
     @ManyToOne
+    @JoinColumn(name = "grupo_id", nullable = false)
+    private TreinoGrupo grupo;
+
+    @ManyToOne
     @JoinColumn(name = "aluno_id", nullable = false)
     private Aluno aluno;
 
@@ -22,10 +26,6 @@ public class TreinoExercicioAluno {
     @ManyToOne
     @JoinColumn(name = "exercicio_id", referencedColumnName = "id", nullable = false)
     private Exercicio exercicio;
-
-    @ManyToOne
-    @JoinColumn(name = "grupo_id")
-    private TreinoGrupo grupo;
 
     @Column(nullable = false)
     private int ordem;

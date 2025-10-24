@@ -23,10 +23,8 @@ public class FichaTreinoDTO {
 
     private String observacao;
 
-    // Construtor padrão
     public FichaTreinoDTO() {}
 
-    // Construtor completo
     public FichaTreinoDTO(String exercicio, String grupoMuscular, Integer series,
                           Integer repMin, Integer repMax, Double pesoInicial, String observacao) {
         this.exercicio = exercicio;
@@ -38,7 +36,6 @@ public class FichaTreinoDTO {
         this.observacao = observacao;
     }
 
-    // Getters e Setters
     public String getExercicio() {
         return exercicio;
     }

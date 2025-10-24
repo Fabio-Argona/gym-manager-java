@@ -10,16 +10,13 @@ public class RedefinirSenhaDTO {
     @JsonProperty("nova_senha")
     private String novaSenha;
 
-    // Construtor padrão
     public RedefinirSenhaDTO() {}
 
-    // Construtor completo
     public RedefinirSenhaDTO(String token, String novaSenha) {
         this.token = token;
         this.novaSenha = novaSenha;
     }
 
-    // Getters e Setters
     public String getToken() {
         return token;
     }

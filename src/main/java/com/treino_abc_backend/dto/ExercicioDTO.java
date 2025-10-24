@@ -29,7 +29,6 @@ public class ExercicioDTO {
     @JsonProperty("aluno_id")
     private UUID alunoId;
 
-    // Getters e Setters
     public UUID getId() {
         return id;
     }

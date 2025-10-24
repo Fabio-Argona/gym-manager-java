@@ -9,16 +9,13 @@ public class AlunoLoginDTO {
 
     private String password;
 
-    // Construtor padrão
     public AlunoLoginDTO() {}
 
-    // Construtor completo
     public AlunoLoginDTO(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
-    // Getters e Setters
     public String getEmail() {
         return email;
     }

@@ -15,6 +15,11 @@ public class Exercicio {
     @Column(nullable = false)
     private String nome;
 
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    private TreinoGrupo grupo;
+
+
     @Column(name = "grupo_muscular", nullable = false)
     private String grupoMuscular;
 
@@ -51,6 +56,15 @@ public class Exercicio {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    public TreinoGrupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(TreinoGrupo grupo) {
+        this.grupo = grupo;
+    }
+
 
     public String getGrupoMuscular() {
         return grupoMuscular;
@@ -107,4 +121,10 @@ public class Exercicio {
     public void setAlunoId(UUID alunoId) {
         this.alunoId = alunoId;
     }
+
+    @Transient
+    public UUID getGrupoId() {
+        return grupo != null ? grupo.getId() : null;
+    }
+
 }

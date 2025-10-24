@@ -16,17 +16,14 @@ public class TreinoGrupoDTO {
 
     private List<TreinoExercicioDTO> exercicios;
 
-    // Construtor padrão
     public TreinoGrupoDTO() {}
 
-    // Construtor completo
     public TreinoGrupoDTO(UUID id, UUID alunoId, String nome) {
         this.id = id;
         this.alunoId = alunoId;
         this.nome = nome;
     }
 
-    // Getters e Setters
     public UUID getId() {
         return id;
     }

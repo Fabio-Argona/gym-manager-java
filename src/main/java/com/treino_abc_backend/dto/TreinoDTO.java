@@ -38,10 +38,8 @@ public class TreinoDTO {
 
     private String observacao;
 
-    // Construtor padrão
     public TreinoDTO() {}
 
-    // Construtor completo
     public TreinoDTO(UUID id, UUID grupoId, UUID alunoId, UUID exercicioId, String nomeExercicio,
                      Integer series, Integer repMin, Integer repMax, Double pesoInicial,
                      String diaSemana, Integer ordem, String observacao) {
@@ -59,7 +57,6 @@ public class TreinoDTO {
         this.observacao = observacao;
     }
 
-    // Getters e Setters
     public UUID getId() {
         return id;
     }

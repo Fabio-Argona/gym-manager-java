@@ -1,7 +1,10 @@
 package com.treino_abc_backend.service;
 
 import com.treino_abc_backend.entity.Exercicio;
+import com.treino_abc_backend.dto.TreinoGrupoDTO;
+import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.ExercicioRepository;
+import com.treino_abc_backend.repository.TreinoGrupoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +15,11 @@ import java.util.UUID;
 public class ExercicioService {
 
     private final ExercicioRepository repository;
+    private final TreinoGrupoRepository grupoRepository;
 
-    public ExercicioService(ExercicioRepository repository) {
+    public ExercicioService(ExercicioRepository repository, TreinoGrupoRepository grupoRepository) {
         this.repository = repository;
+        this.grupoRepository = grupoRepository;
     }
 
     public List<Exercicio> getTodos() {
@@ -71,6 +76,14 @@ public class ExercicioService {
 
     public Exercicio adicionarAoTreino(Exercicio exercicio) {
         validarAluno(exercicio);
+
+
+        if (exercicio.getGrupoId() != null) {
+            TreinoGrupo grupo = grupoRepository.findById(exercicio.getGrupoId())
+                    .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
+            exercicio.setGrupo(grupo);
+        }
+
         return repository.save(exercicio);
     }
 

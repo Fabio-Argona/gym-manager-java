@@ -10,21 +10,17 @@ public class TokenResponseDTO {
     @JsonProperty("aluno")
     private AlunoDTO aluno;
 
-    // Construtor padrão
     public TokenResponseDTO() {}
 
-    // Construtor completo
     public TokenResponseDTO(String token, AlunoDTO aluno) {
         this.token = token;
         this.aluno = aluno;
     }
 
-    // Construtor com apenas o token
     public TokenResponseDTO(String token) {
         this.token = token;
     }
 
-    // Getters e Setters
     public String getToken() {
         return token;
     }
