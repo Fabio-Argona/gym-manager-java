@@ -41,6 +41,13 @@ public class Exercicio {
     @Column(name = "aluno_id", nullable = false)
     private UUID alunoId;
 
+    @Column(name = "ativo", nullable = false)
+    private boolean ativo = true;
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -122,9 +129,20 @@ public class Exercicio {
         this.alunoId = alunoId;
     }
 
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     @Transient
     public UUID getGrupoId() {
         return grupo != null ? grupo.getId() : null;
     }
 
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
 }

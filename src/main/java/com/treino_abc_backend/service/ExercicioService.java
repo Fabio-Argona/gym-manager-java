@@ -1,7 +1,6 @@
 package com.treino_abc_backend.service;
 
 import com.treino_abc_backend.entity.Exercicio;
-import com.treino_abc_backend.dto.TreinoGrupoDTO;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
@@ -28,17 +27,23 @@ public class ExercicioService {
 
     public List<Exercicio> getPorAluno(String alunoId) {
         UUID alunoUUID = UUID.fromString(alunoId);
-        return repository.findByAlunoId(alunoUUID);
+        return repository.findByAlunoIdAndAtivoTrue(alunoUUID); // ✅ apenas ativos
     }
 
     public Exercicio salvar(Exercicio exercicio) {
         validarAluno(exercicio);
+        if (exercicio.getAtivo() == null) {
+            exercicio.setAtivo(true); // ✅ padrão ativo
+        }
         return repository.save(exercicio);
     }
 
     public List<Exercicio> salvarTodos(List<Exercicio> exercicios) {
         for (Exercicio e : exercicios) {
             validarAluno(e);
+            if (e.getAtivo() == null) {
+                e.setAtivo(true);
+            }
         }
         return repository.saveAll(exercicios);
     }
@@ -59,6 +64,7 @@ public class ExercicioService {
         exercicio.setRepMax(novo.getRepMax());
         exercicio.setPesoInicial(novo.getPesoInicial());
         exercicio.setObservacao(novo.getObservacao());
+        exercicio.setAtivo(novo.getAtivo()); // ✅ atualiza status
 
         return Optional.of(repository.save(exercicio));
     }
@@ -77,11 +83,14 @@ public class ExercicioService {
     public Exercicio adicionarAoTreino(Exercicio exercicio) {
         validarAluno(exercicio);
 
-
         if (exercicio.getGrupoId() != null) {
             TreinoGrupo grupo = grupoRepository.findById(exercicio.getGrupoId())
                     .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
             exercicio.setGrupo(grupo);
+        }
+
+        if (exercicio.getAtivo() == null) {
+            exercicio.setAtivo(true); // ✅ padrão ativo
         }
 
         return repository.save(exercicio);
