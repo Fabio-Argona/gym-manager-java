@@ -29,6 +29,13 @@ public class ExercicioDTO {
     @JsonProperty("aluno_id")
     private UUID alunoId;
 
+    @JsonProperty("ativo")
+    private boolean ativo = true;
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -100,4 +107,8 @@ public class ExercicioDTO {
     public void setAlunoId(UUID alunoId) {
         this.alunoId = alunoId;
     }
+
+
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+
 }
