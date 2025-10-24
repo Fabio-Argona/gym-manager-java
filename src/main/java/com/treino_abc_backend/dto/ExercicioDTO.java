@@ -1,21 +1,35 @@
 package com.treino_abc_backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public class ExercicioDTO {
 
     private UUID id;
+
     private String nome;
+
+    @JsonProperty("grupo_muscular")
     private String grupoMuscular;
+
     private Integer series;
+
+    @JsonProperty("rep_min")
     private Integer repMin;
+
+    @JsonProperty("rep_max")
     private Integer repMax;
+
+    @JsonProperty("peso_inicial")
     private Double pesoInicial;
+
     private String observacao;
+
+    @JsonProperty("aluno_id")
     private UUID alunoId;
 
     // Getters e Setters
-
     public UUID getId() {
         return id;
     }

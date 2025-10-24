@@ -1,14 +1,44 @@
 package com.treino_abc_backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class FichaTreinoDTO {
+
+    @JsonProperty("nome")
     private String exercicio;
+
+    @JsonProperty("grupo_muscular")
     private String grupoMuscular;
+
     private Integer series;
+
+    @JsonProperty("rep_min")
     private Integer repMin;
+
+    @JsonProperty("rep_max")
     private Integer repMax;
+
+    @JsonProperty("peso_inicial")
     private Double pesoInicial;
+
     private String observacao;
 
+    // Construtor padrão
+    public FichaTreinoDTO() {}
+
+    // Construtor completo
+    public FichaTreinoDTO(String exercicio, String grupoMuscular, Integer series,
+                          Integer repMin, Integer repMax, Double pesoInicial, String observacao) {
+        this.exercicio = exercicio;
+        this.grupoMuscular = grupoMuscular;
+        this.series = series;
+        this.repMin = repMin;
+        this.repMax = repMax;
+        this.pesoInicial = pesoInicial;
+        this.observacao = observacao;
+    }
+
+    // Getters e Setters
     public String getExercicio() {
         return exercicio;
     }
@@ -64,18 +94,4 @@ public class FichaTreinoDTO {
     public void setObservacao(String observacao) {
         this.observacao = observacao;
     }
-
-
-    // Construtor
-    public FichaTreinoDTO(String exercicio, String grupoMuscular, Integer series, Integer repMin, Integer repMax, Double pesoInicial, String observacao) {
-        this.exercicio = exercicio;
-        this.grupoMuscular = grupoMuscular;
-        this.series = series;
-        this.repMin = repMin;
-        this.repMax = repMax;
-        this.pesoInicial = pesoInicial;
-        this.observacao = observacao;
-    }
-
-
 }
