@@ -86,7 +86,7 @@ public class ExercicioService {
         if (exercicio.getGrupoId() != null) {
             TreinoGrupo grupo = grupoRepository.findById(exercicio.getGrupoId())
                     .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
-            exercicio.setGrupo(grupo); // ← ESSENCIAL para preencher grupo_id no banco
+            exercicio.setGrupo(grupo);
         }
 
         if (exercicio.getAtivo() == null) {
