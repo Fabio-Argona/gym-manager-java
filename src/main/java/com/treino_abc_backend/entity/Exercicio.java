@@ -15,9 +15,14 @@ public class Exercicio {
     @Column(nullable = false)
     private String nome;
 
+    // Campo transitório para receber o grupoId via JSON
     @Transient
     private UUID grupoId;
 
+    // Relacionamento com TreinoGrupo para persistência no banco
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    private TreinoGrupo grupo;
 
     @Column(name = "grupo_muscular", nullable = false)
     private String grupoMuscular;
@@ -43,9 +48,7 @@ public class Exercicio {
     @Column(name = "ativo", nullable = false)
     private boolean ativo = true;
 
-    public boolean isAtivo() {
-        return ativo;
-    }
+    // Getters e Setters
 
     public UUID getId() {
         return id;
@@ -63,10 +66,21 @@ public class Exercicio {
         this.nome = nome;
     }
 
+    public UUID getGrupoId() {
+        return grupoId;
+    }
+
     public void setGrupoId(UUID grupoId) {
         this.grupoId = grupoId;
     }
 
+    public TreinoGrupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(TreinoGrupo grupo) {
+        this.grupo = grupo;
+    }
 
     public String getGrupoMuscular() {
         return grupoMuscular;
@@ -124,10 +138,6 @@ public class Exercicio {
         this.alunoId = alunoId;
     }
 
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
-
     public Boolean getAtivo() {
         return ativo;
     }
@@ -136,7 +146,11 @@ public class Exercicio {
         this.ativo = ativo;
     }
 
-    public UUID getGrupoId() {
-        return grupoId;
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 }
