@@ -15,9 +15,8 @@ public class Exercicio {
     @Column(nullable = false)
     private String nome;
 
-    @ManyToOne
-    @JoinColumn(name = "grupo_id")
-    private TreinoGrupo grupo;
+    @Transient
+    private UUID grupoId;
 
 
     @Column(name = "grupo_muscular", nullable = false)
@@ -64,12 +63,8 @@ public class Exercicio {
         this.nome = nome;
     }
 
-    public TreinoGrupo getGrupo() {
-        return grupo;
-    }
-
-    public void setGrupo(TreinoGrupo grupo) {
-        this.grupo = grupo;
+    public void setGrupoId(UUID grupoId) {
+        this.grupoId = grupoId;
     }
 
 
@@ -133,16 +128,15 @@ public class Exercicio {
         this.ativo = ativo;
     }
 
-    @Transient
-    public UUID getGrupoId() {
-        return grupo != null ? grupo.getId() : null;
-    }
-
     public Boolean getAtivo() {
         return ativo;
     }
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public UUID getGrupoId() {
+        return grupoId;
     }
 }
