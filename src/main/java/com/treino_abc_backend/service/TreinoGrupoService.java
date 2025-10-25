@@ -23,7 +23,8 @@ public class TreinoGrupoService {
     }
 
     public TreinoGrupoDTO criar(TreinoGrupoDTO dto) {
-        Aluno aluno = alunoRepo.findById(dto.getAlunoId())
+        UUID alunoId = dto.getAlunoId();
+        Aluno aluno = alunoRepo.findById(alunoId)
                 .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
 
         TreinoGrupo grupo = new TreinoGrupo();
@@ -31,7 +32,7 @@ public class TreinoGrupoService {
         grupo.setAluno(aluno);
 
         TreinoGrupo salvo = grupoRepo.save(grupo);
-        return toDTO(salvo);
+        return new TreinoGrupoDTO(salvo.getId(), aluno.getId(), salvo.getNome());
     }
 
     public List<TreinoGrupoDTO> listarPorAluno(UUID alunoId) {
