@@ -53,7 +53,6 @@ public class ExercicioService {
     public Exercicio criarExercicio(ExercicioDTO dto) {
         Exercicio exercicio = new Exercicio();
         exercicio.setNome(dto.getNome());
-        exercicio.setAlunoId(dto.getAlunoId());
         exercicio.setGrupoMuscular(dto.getGrupoMuscular());
         exercicio.setSeries(dto.getSeries());
         exercicio.setRepMin(dto.getRepMin());
@@ -61,6 +60,7 @@ public class ExercicioService {
         exercicio.setPesoInicial(dto.getPesoInicial());
         exercicio.setObservacao(dto.getObservacao());
         exercicio.setAtivo(dto.isAtivo());
+        exercicio.setAlunoId(dto.getAlunoId());
         exercicio.setDataCriacao(LocalDateTime.now());
 
         if (dto.getGrupoId() != null) {
@@ -71,6 +71,7 @@ public class ExercicioService {
 
         return repository.save(exercicio);
     }
+
 
     public List<Exercicio> salvarTodos(List<Exercicio> exercicios) {
         for (Exercicio e : exercicios) {
@@ -149,4 +150,6 @@ public class ExercicioService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercício deve ter um aluno associado");
         }
     }
+
+
 }
