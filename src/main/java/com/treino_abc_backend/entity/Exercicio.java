@@ -2,6 +2,8 @@ package com.treino_abc_backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -48,6 +50,10 @@ public class Exercicio {
 
     @Column(name = "ativo", nullable = false)
     private boolean ativo = true;
+
+    @Column(name = "data_criacao", nullable = false)
+    private LocalDateTime dataCriacao;
+
 
     // Getters e Setters
 
@@ -154,5 +160,13 @@ public class Exercicio {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
     }
 }

@@ -6,6 +6,7 @@ import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +38,10 @@ public class ExercicioService {
             TreinoGrupo grupo = grupoRepository.findById(exercicio.getGrupoId())
                     .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
             exercicio.setGrupo(grupo);
+        }
+
+        if (exercicio.getDataCriacao() == null) {
+            exercicio.setDataCriacao(LocalDateTime.now());
         }
 
         if (exercicio.getAtivo() == null) {
