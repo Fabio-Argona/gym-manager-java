@@ -32,11 +32,20 @@ public class ExercicioService {
 
     public Exercicio salvar(Exercicio exercicio) {
         validarAluno(exercicio);
-        if (exercicio.getAtivo() == null) {
-            exercicio.setAtivo(true); // ✅ padrão ativo
+        
+        if (exercicio.getGrupoId() != null) {
+            TreinoGrupo grupo = grupoRepository.findById(exercicio.getGrupoId())
+                    .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
+            exercicio.setGrupo(grupo);
         }
+
+        if (exercicio.getAtivo() == null) {
+            exercicio.setAtivo(true);
+        }
+
         return repository.save(exercicio);
     }
+
 
     public List<Exercicio> salvarTodos(List<Exercicio> exercicios) {
         for (Exercicio e : exercicios) {
@@ -64,7 +73,7 @@ public class ExercicioService {
         exercicio.setRepMax(novo.getRepMax());
         exercicio.setPesoInicial(novo.getPesoInicial());
         exercicio.setObservacao(novo.getObservacao());
-        exercicio.setAtivo(novo.getAtivo()); // ✅ atualiza status
+        exercicio.setAtivo(novo.getAtivo());
 
         return Optional.of(repository.save(exercicio));
     }
