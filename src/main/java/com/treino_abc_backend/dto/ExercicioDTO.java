@@ -1,6 +1,7 @@
 package com.treino_abc_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.treino_abc_backend.entity.Exercicio;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -136,4 +137,7 @@ public class ExercicioDTO {
     public void setDataCriacao(LocalDateTime dataCriacao) {
         this.dataCriacao = dataCriacao;
     }
+
+
+
 }

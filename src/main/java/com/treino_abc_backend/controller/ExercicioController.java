@@ -1,10 +1,15 @@
 package com.treino_abc_backend.controller;
 
+import com.treino_abc_backend.dto.ExercicioDTO;
 import com.treino_abc_backend.entity.Exercicio;
 import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.service.ExercicioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -27,12 +32,13 @@ public class ExercicioController {
     }
 
     @PostMapping
-    public ResponseEntity<Exercicio> criar(@RequestHeader("aluno-id") String alunoId,
-                                           @RequestBody Exercicio exercicio) {
-        exercicio.setAlunoId(UUID.fromString(alunoId));
-        Exercicio salvo = service.salvar(exercicio);
-        return ResponseEntity.status(201).body(salvo);
+    public ResponseEntity<ExercicioDTO> criar(@RequestHeader("aluno-id") String alunoId,
+                                              @RequestBody ExercicioDTO dto) {
+        dto.setAlunoId(UUID.fromString(alunoId));
+        Exercicio salvo = service.criarExercicio(dto);
+        return ResponseEntity.status(201).body(toDTO(salvo));
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Exercicio> atualizar(@RequestHeader("aluno-id") String alunoId,
@@ -66,5 +72,22 @@ public class ExercicioController {
                                                 @PathVariable String id) {
         service.removerDoTreino(id, UUID.fromString(alunoId));
         return ResponseEntity.noContent().build();
+    }
+
+    private ExercicioDTO toDTO(Exercicio e) {
+        ExercicioDTO dto = new ExercicioDTO();
+        dto.setId(e.getId());
+        dto.setNome(e.getNome());
+        dto.setGrupoMuscular(e.getGrupoMuscular());
+        dto.setSeries(e.getSeries());
+        dto.setRepMin(e.getRepMin());
+        dto.setRepMax(e.getRepMax());
+        dto.setPesoInicial(e.getPesoInicial());
+        dto.setObservacao(e.getObservacao());
+        dto.setAlunoId(e.getAlunoId());
+        dto.setAtivo(e.isAtivo());
+        dto.setDataCriacao(e.getDataCriacao());
+        dto.setGrupoId(e.getGrupoId());
+        return dto;
     }
 }
