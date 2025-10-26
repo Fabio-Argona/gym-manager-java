@@ -51,13 +51,17 @@ public class ExercicioController {
     public ResponseEntity<Exercicio> atualizar(@PathVariable UUID id,
                                                @RequestBody ExercicioEdicaoDTO dto,
                                                @RequestHeader("aluno-id") String alunoId) {
+        // Busca o exercício existente
         Exercicio existente = exercicioRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
 
-        if (!existente.getAlunoId().equals(UUID.fromString(alunoId))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        // Valida se o exercício pertence ao aluno
+        UUID alunoUUID = UUID.fromString(alunoId);
+        if (!existente.getAlunoId().equals(alunoUUID)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode editar exercícios de outro aluno");
         }
 
+        // Atualiza os campos básicos
         existente.setNome(dto.getNome());
         existente.setGrupoMuscular(dto.getGrupoMuscular());
         existente.setSeries(dto.getSeries());
@@ -67,14 +71,18 @@ public class ExercicioController {
         existente.setObservacao(dto.getObservacao());
         existente.setAtivo(dto.isAtivo());
 
+        // Atualiza o grupo, se fornecido
         if (dto.getGrupoId() != null) {
             TreinoGrupo grupo = treinoGrupoRepository.findById(dto.getGrupoId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
             existente.setGrupo(grupo);
         }
 
-        return ResponseEntity.ok(exercicioRepository.save(existente));
+        // Salva e retorna o exercício atualizado
+        Exercicio atualizado = exercicioRepository.save(existente);
+        return ResponseEntity.ok(atualizado);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@RequestHeader("aluno-id") String alunoId,
