@@ -42,20 +42,17 @@ public class ExercicioController {
     }
 
 
-    @PutMapping
-    public ResponseEntity<Exercicio> atualizar(@RequestBody Exercicio novo, @RequestHeader("aluno-id") String alunoId) {
-        Exercicio existente = exercicioRepository.findById(novo.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    @PutMapping("/{id}")
+    public ResponseEntity<Exercicio> atualizar(@PathVariable UUID id,
+                                               @RequestBody Exercicio novo,
+                                               @RequestHeader("aluno-id") String alunoId) {
+        novo.setId(id); // garante que o ID do path seja usado
+        Exercicio atualizado = service.atualizar(novo, UUID.fromString(alunoId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao atualizar"));
 
-        if (!existente.getAlunoId().equals(alunoId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        // Atualiza apenas o campo ativo
-        existente.setAtivo(novo.isAtivo());
-
-        return ResponseEntity.ok(exercicioRepository.save(existente));
+        return ResponseEntity.ok(atualizado);
     }
+
 
 
     @DeleteMapping("/{id}")
