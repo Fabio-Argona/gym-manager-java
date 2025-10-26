@@ -48,7 +48,7 @@ public class ExercicioController {
     public ResponseEntity<Void> deletar(@RequestHeader("aluno-id") String alunoId,
                                         @PathVariable String id) {
         service.deletar(id, UUID.fromString(alunoId));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/treino/{treinoNome}")
@@ -65,7 +65,6 @@ public class ExercicioController {
                                                 @PathVariable String treinoNome,
                                                 @PathVariable String id) {
         service.removerDoTreino(id, UUID.fromString(alunoId));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
-
 }
