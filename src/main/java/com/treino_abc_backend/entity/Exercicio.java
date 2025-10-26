@@ -1,6 +1,7 @@
 package com.treino_abc_backend.entity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -18,11 +19,6 @@ public class Exercicio {
     @Column(nullable = false)
     private String nome;
 
-    // Campo transitório para receber o grupoId via JSON
-    @Transient
-    private UUID grupoId;
-
-    // Relacionamento com TreinoGrupo para persistência no banco
     @ManyToOne
     @JoinColumn(name = "grupo_id")
     private TreinoGrupo grupo;
@@ -54,7 +50,6 @@ public class Exercicio {
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
 
-
     // Getters e Setters
 
     public UUID getId() {
@@ -73,14 +68,6 @@ public class Exercicio {
         this.nome = nome;
     }
 
-    public UUID getGrupoId() {
-        return grupoId;
-    }
-
-    public void setGrupoId(UUID grupoId) {
-        this.grupoId = grupoId;
-    }
-
     @JsonIgnore
     public TreinoGrupo getGrupo() {
         return grupo;
@@ -88,6 +75,12 @@ public class Exercicio {
 
     public void setGrupo(TreinoGrupo grupo) {
         this.grupo = grupo;
+    }
+
+    @Transient
+    @JsonProperty("grupoId")
+    public UUID getGrupoId() {
+        return grupo != null ? grupo.getId() : null;
     }
 
     public String getGrupoMuscular() {

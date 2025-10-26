@@ -1,6 +1,7 @@
 package com.treino_abc_backend.controller;
 
 import com.treino_abc_backend.entity.Exercicio;
+import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.service.ExercicioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +14,11 @@ import java.util.UUID;
 public class ExercicioController {
 
     private final ExercicioService service;
+    private final ExercicioRepository exercicioRepository;
 
-    public ExercicioController(ExercicioService service) {
+    public ExercicioController(ExercicioService service, ExercicioRepository exercicioRepository) {
         this.service = service;
+        this.exercicioRepository = exercicioRepository;
     }
 
     @GetMapping
@@ -64,4 +67,5 @@ public class ExercicioController {
         service.removerDoTreino(id, UUID.fromString(alunoId));
         return ResponseEntity.ok().build();
     }
+
 }
