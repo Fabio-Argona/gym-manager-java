@@ -1,4 +1,5 @@
 package com.treino_abc_backend.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import java.util.UUID;
@@ -74,6 +75,7 @@ public class Exercicio {
         this.grupoId = grupoId;
     }
 
+    @JsonIgnore
     public TreinoGrupo getGrupo() {
         return grupo;
     }
