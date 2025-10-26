@@ -99,6 +99,12 @@ public class ExercicioService {
         existente.setObservacao(novo.getObservacao());
         existente.setAtivo(novo.isAtivo());
 
+        if (novo.getGrupoId() != null) {
+            TreinoGrupo grupo = grupoRepository.findById(novo.getGrupoId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
+            existente.setGrupo(grupo);
+        }
+
         return Optional.of(repository.save(existente));
     }
 
