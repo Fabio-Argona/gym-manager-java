@@ -27,12 +27,12 @@ public class ExercicioService {
 
     public List<Exercicio> getPorAluno(String alunoId) {
         UUID alunoUUID = UUID.fromString(alunoId);
-        return repository.findByAlunoIdAndAtivoTrue(alunoUUID); // ✅ apenas ativos
+        return repository.findByAlunoIdAndAtivoTrue(alunoUUID);
     }
 
     public Exercicio salvar(Exercicio exercicio) {
         validarAluno(exercicio);
-        
+
         if (exercicio.getGrupoId() != null) {
             TreinoGrupo grupo = grupoRepository.findById(exercicio.getGrupoId())
                     .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
