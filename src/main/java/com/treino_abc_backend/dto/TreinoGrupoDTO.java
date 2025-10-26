@@ -9,7 +9,7 @@ public class TreinoGrupoDTO {
 
     private UUID id;
 
-    @JsonProperty("aluno_id")
+    @JsonProperty("alunoId")
     private UUID alunoId;
 
     private String nome;
