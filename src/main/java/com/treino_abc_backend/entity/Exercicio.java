@@ -139,14 +139,6 @@ public class Exercicio {
         this.alunoId = alunoId;
     }
 
-    public Boolean getAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
-    }
-
     public boolean isAtivo() {
         return ativo;
     }

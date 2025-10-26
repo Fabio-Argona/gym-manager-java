@@ -1,10 +1,13 @@
 package com.treino_abc_backend.service;
 
+import com.treino_abc_backend.dto.ExercicioDTO;
 import com.treino_abc_backend.entity.Exercicio;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +31,7 @@ public class ExercicioService {
 
     public List<Exercicio> getPorAluno(String alunoId) {
         UUID alunoUUID = UUID.fromString(alunoId);
-        return repository.findByAlunoIdAndAtivoTrue(alunoUUID);
+        return repository.findByAlunoIdAndGrupoIsNotNullAndAtivoTrue(alunoUUID);
     }
 
     public Exercicio salvar(Exercicio exercicio) {
@@ -36,7 +39,7 @@ public class ExercicioService {
 
         if (exercicio.getGrupoId() != null) {
             TreinoGrupo grupo = grupoRepository.findById(exercicio.getGrupoId())
-                    .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
             exercicio.setGrupo(grupo);
         }
 
@@ -44,51 +47,67 @@ public class ExercicioService {
             exercicio.setDataCriacao(LocalDateTime.now());
         }
 
-        if (exercicio.getAtivo() == null) {
-            exercicio.setAtivo(true);
+        return repository.save(exercicio);
+    }
+
+    public Exercicio criarExercicio(ExercicioDTO dto) {
+        Exercicio exercicio = new Exercicio();
+        exercicio.setNome(dto.getNome());
+        exercicio.setAlunoId(dto.getAlunoId());
+        exercicio.setGrupoMuscular(dto.getGrupoMuscular());
+        exercicio.setSeries(dto.getSeries());
+        exercicio.setRepMin(dto.getRepMin());
+        exercicio.setRepMax(dto.getRepMax());
+        exercicio.setPesoInicial(dto.getPesoInicial());
+        exercicio.setObservacao(dto.getObservacao());
+        exercicio.setAtivo(dto.isAtivo());
+        exercicio.setDataCriacao(LocalDateTime.now());
+
+        if (dto.getGrupoId() != null) {
+            TreinoGrupo grupo = grupoRepository.findById(dto.getGrupoId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
+            exercicio.setGrupo(grupo);
         }
 
         return repository.save(exercicio);
     }
 
-
     public List<Exercicio> salvarTodos(List<Exercicio> exercicios) {
         for (Exercicio e : exercicios) {
             validarAluno(e);
-            if (e.getAtivo() == null) {
-                e.setAtivo(true);
+            if (e.getDataCriacao() == null) {
+                e.setDataCriacao(LocalDateTime.now());
             }
         }
         return repository.saveAll(exercicios);
     }
 
     public Optional<Exercicio> atualizar(Exercicio novo, UUID alunoId) {
-        Optional<Exercicio> existente = repository.findById(novo.getId());
-        if (existente.isEmpty()) return Optional.empty();
+        Exercicio existente = repository.findById(novo.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
 
-        Exercicio exercicio = existente.get();
-        if (!exercicio.getAlunoId().equals(alunoId)) {
-            throw new RuntimeException("Você não pode alterar exercícios de outro aluno.");
+        if (!existente.getAlunoId().equals(alunoId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode alterar exercícios de outro aluno");
         }
 
-        exercicio.setNome(novo.getNome());
-        exercicio.setGrupoMuscular(novo.getGrupoMuscular());
-        exercicio.setSeries(novo.getSeries());
-        exercicio.setRepMin(novo.getRepMin());
-        exercicio.setRepMax(novo.getRepMax());
-        exercicio.setPesoInicial(novo.getPesoInicial());
-        exercicio.setObservacao(novo.getObservacao());
-        exercicio.setAtivo(novo.getAtivo());
+        existente.setNome(novo.getNome());
+        existente.setGrupoMuscular(novo.getGrupoMuscular());
+        existente.setSeries(novo.getSeries());
+        existente.setRepMin(novo.getRepMin());
+        existente.setRepMax(novo.getRepMax());
+        existente.setPesoInicial(novo.getPesoInicial());
+        existente.setObservacao(novo.getObservacao());
+        existente.setAtivo(novo.isAtivo());
 
-        return Optional.of(repository.save(exercicio));
+        return Optional.of(repository.save(existente));
     }
 
     public void deletar(String id, UUID alunoId) {
         Exercicio exercicio = repository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new RuntimeException("Exercício não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
 
         if (!exercicio.getAlunoId().equals(alunoId)) {
-            throw new RuntimeException("Você não pode deletar exercícios de outro aluno.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode deletar exercícios de outro aluno");
         }
 
         repository.deleteById(exercicio.getId());
@@ -99,34 +118,29 @@ public class ExercicioService {
 
         if (exercicio.getGrupoId() != null) {
             TreinoGrupo grupo = grupoRepository.findById(exercicio.getGrupoId())
-                    .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
             exercicio.setGrupo(grupo);
         }
 
-        if (exercicio.getAtivo() == null) {
-            exercicio.setAtivo(true);
-        }
-
+        exercicio.setDataCriacao(LocalDateTime.now());
         return repository.save(exercicio);
     }
-
 
     public void removerDoTreino(String id, UUID alunoId) {
         deletar(id, alunoId);
     }
 
-    private void validarAluno(Exercicio exercicio) {
-        if (exercicio.getAlunoId() == null) {
-            throw new RuntimeException("Exercício deve ter um aluno associado.");
-        }
-    }
-
     public Optional<Exercicio> atualizarStatus(UUID id, boolean ativo) {
-        Optional<Exercicio> exercicioOpt = repository.findById(id);
-        if (exercicioOpt.isEmpty()) return Optional.empty();
+        Exercicio exercicio = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
 
-        Exercicio exercicio = exercicioOpt.get();
         exercicio.setAtivo(ativo);
         return Optional.of(repository.save(exercicio));
+    }
+
+    private void validarAluno(Exercicio exercicio) {
+        if (exercicio.getAlunoId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercício deve ter um aluno associado");
+        }
     }
 }
