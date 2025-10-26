@@ -1,7 +1,6 @@
 package com.treino_abc_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -9,6 +8,9 @@ import java.util.UUID;
 public class ExercicioDTO {
 
     private UUID id;
+
+    @JsonProperty("grupo_id")
+    private UUID grupoId;
 
     private String nome;
 
@@ -34,13 +36,10 @@ public class ExercicioDTO {
     @JsonProperty("ativo")
     private boolean ativo = true;
 
-    @Column(name = "data_criacao", nullable = false)
+    @JsonProperty("data_criacao")
     private LocalDateTime dataCriacao;
 
-
-    public boolean isAtivo() {
-        return ativo;
-    }
+    // Getters e Setters
 
     public UUID getId() {
         return id;
@@ -48,6 +47,14 @@ public class ExercicioDTO {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getGrupoId() {
+        return grupoId;
+    }
+
+    public void setGrupoId(UUID grupoId) {
+        this.grupoId = grupoId;
     }
 
     public String getNome() {
@@ -114,7 +121,13 @@ public class ExercicioDTO {
         this.alunoId = alunoId;
     }
 
-    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
 
     public LocalDateTime getDataCriacao() {
         return dataCriacao;
