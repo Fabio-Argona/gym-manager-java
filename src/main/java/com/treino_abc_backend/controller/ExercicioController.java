@@ -4,11 +4,13 @@ import com.treino_abc_backend.dto.ExercicioDTO;
 import com.treino_abc_backend.entity.Exercicio;
 import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.service.ExercicioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.List;
@@ -40,15 +42,21 @@ public class ExercicioController {
     }
 
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Exercicio> atualizar(@RequestHeader("aluno-id") String alunoId,
-                                               @PathVariable String id,
-                                               @RequestBody Exercicio exercicio) {
-        exercicio.setId(UUID.fromString(id));
-        return service.atualizar(exercicio, UUID.fromString(alunoId))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(403).build());
+    @PutMapping
+    public ResponseEntity<Exercicio> atualizar(@RequestBody Exercicio novo, @RequestHeader("aluno-id") String alunoId) {
+        Exercicio existente = exercicioRepository.findById(novo.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!existente.getAlunoId().equals(alunoId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        // Atualiza apenas o campo ativo
+        existente.setAtivo(novo.isAtivo());
+
+        return ResponseEntity.ok(exercicioRepository.save(existente));
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@RequestHeader("aluno-id") String alunoId,
