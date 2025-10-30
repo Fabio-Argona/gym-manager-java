@@ -1,25 +1,44 @@
 package com.treino_abc_backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public class TreinoDTO {
 
     private UUID id;
+
+    @JsonProperty("grupo_id")
     private UUID grupoId;
+
+    @JsonProperty("aluno_id")
     private UUID alunoId;
+
+    @JsonProperty("exercicio_id")
     private UUID exercicioId;
+
+    @JsonProperty("nome")
     private String nomeExercicio;
+
     private Integer series;
+
+    @JsonProperty("rep_min")
     private Integer repMin;
+
+    @JsonProperty("rep_max")
     private Integer repMax;
+
+    @JsonProperty("peso_inicial")
     private Double pesoInicial;
+
+    @JsonProperty("dia_semana")
     private String diaSemana;
+
     private Integer ordem;
+
     private String observacao;
 
-    public TreinoDTO() {
-        // Construtor vazio para frameworks
-    }
+    public TreinoDTO() {}
 
     public TreinoDTO(UUID id, UUID grupoId, UUID alunoId, UUID exercicioId, String nomeExercicio,
                      Integer series, Integer repMin, Integer repMax, Double pesoInicial,

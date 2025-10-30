@@ -1,18 +1,44 @@
 package com.treino_abc_backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.treino_abc_backend.entity.Exercicio;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ExercicioDTO {
 
     private UUID id;
+
+    @JsonProperty("grupo_id")
+    private UUID grupoId;
+
     private String nome;
+
+    @JsonProperty("grupo_muscular")
     private String grupoMuscular;
+
     private Integer series;
+
+    @JsonProperty("rep_min")
     private Integer repMin;
+
+    @JsonProperty("rep_max")
     private Integer repMax;
+
+    @JsonProperty("peso_inicial")
     private Double pesoInicial;
+
     private String observacao;
+
+    @JsonProperty("aluno_id")
     private UUID alunoId;
+
+    @JsonProperty("ativo")
+    private boolean ativo = true;
+
+    @JsonProperty("data_criacao")
+    private LocalDateTime dataCriacao;
 
     // Getters e Setters
 
@@ -22,6 +48,14 @@ public class ExercicioDTO {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getGrupoId() {
+        return grupoId;
+    }
+
+    public void setGrupoId(UUID grupoId) {
+        this.grupoId = grupoId;
     }
 
     public String getNome() {
@@ -87,4 +121,23 @@ public class ExercicioDTO {
     public void setAlunoId(UUID alunoId) {
         this.alunoId = alunoId;
     }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
+
+
 }

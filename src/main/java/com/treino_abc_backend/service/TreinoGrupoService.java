@@ -5,7 +5,6 @@ import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,14 +14,17 @@ import java.util.stream.Collectors;
 @Service
 public class TreinoGrupoService {
 
-    @Autowired
-    private TreinoGrupoRepository grupoRepo;
+    private final TreinoGrupoRepository grupoRepo;
+    private final AlunoRepository alunoRepo;
 
-    @Autowired
-    private AlunoRepository alunoRepo;
+    public TreinoGrupoService(TreinoGrupoRepository grupoRepo, AlunoRepository alunoRepo) {
+        this.grupoRepo = grupoRepo;
+        this.alunoRepo = alunoRepo;
+    }
 
     public TreinoGrupoDTO criar(TreinoGrupoDTO dto) {
-        Aluno aluno = alunoRepo.findById(dto.getAlunoId())
+        UUID alunoId = dto.getAlunoId();
+        Aluno aluno = alunoRepo.findById(alunoId)
                 .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
 
         TreinoGrupo grupo = new TreinoGrupo();
@@ -30,22 +32,12 @@ public class TreinoGrupoService {
         grupo.setAluno(aluno);
 
         TreinoGrupo salvo = grupoRepo.save(grupo);
-
-        return new TreinoGrupoDTO(
-                salvo.getId(),
-                aluno.getId(),
-                salvo.getNome()
-        );
+        return new TreinoGrupoDTO(salvo.getId(), aluno.getId(), salvo.getNome());
     }
-
 
     public List<TreinoGrupoDTO> listarPorAluno(UUID alunoId) {
         return grupoRepo.findByAluno_Id(alunoId).stream()
-                .map(grupo -> new TreinoGrupoDTO(
-                        grupo.getId(),
-                        grupo.getAluno().getId(),
-                        grupo.getNome()
-                ))
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -60,18 +52,19 @@ public class TreinoGrupoService {
         TreinoGrupo grupo = grupoRepo.findById(grupoId)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
 
-        // Atualizar apenas campos não nulos (PATCH)
         if (dto.getNome() != null && !dto.getNome().isBlank()) {
             grupo.setNome(dto.getNome());
         }
 
         TreinoGrupo salvo = grupoRepo.save(grupo);
-
-        return new TreinoGrupoDTO(
-                salvo.getId(),
-                salvo.getAluno().getId(),
-                salvo.getNome()
-        );
+        return toDTO(salvo);
     }
 
+    private TreinoGrupoDTO toDTO(TreinoGrupo grupo) {
+        return new TreinoGrupoDTO(
+                grupo.getId(),
+                grupo.getAluno().getId(),
+                grupo.getNome()
+        );
+    }
 }

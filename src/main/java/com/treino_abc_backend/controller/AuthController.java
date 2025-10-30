@@ -1,9 +1,6 @@
 package com.treino_abc_backend.controller;
 
-import com.treino_abc_backend.dto.AlunoDTO;
-import com.treino_abc_backend.dto.AlunoLoginDTO;
-import com.treino_abc_backend.dto.AlunoRegisterDTO;
-import com.treino_abc_backend.dto.TokenResponseDTO;
+import com.treino_abc_backend.dto.*;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.security.JwtUtil;
 import com.treino_abc_backend.service.AuthService;
@@ -21,7 +18,6 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AlunoRegisterDTO dto) {
         try {
@@ -35,11 +31,8 @@ public class AuthController {
             aluno.setPassword(dto.getPassword());
 
             Aluno saved = authService.register(aluno);
-
-            // Gera token após registro
             String token = jwtUtil.generateToken(saved.getEmail(), saved.getCpf());
 
-            // Retorna DTO + token
             AlunoDTO alunoDTO = new AlunoDTO();
             alunoDTO.setId(saved.getId());
             alunoDTO.setNome(saved.getNome());
@@ -50,12 +43,10 @@ public class AuthController {
             alunoDTO.setLogin(saved.getLogin());
 
             return ResponseEntity.ok(new TokenResponseDTO(token, alunoDTO));
-
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AlunoLoginDTO dto) {
@@ -67,4 +58,23 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/recuperar-senha")
+    public ResponseEntity<?> recuperarSenha(@RequestBody RecuperarSenhaDTO dto) {
+        try {
+            authService.enviarEmailRecuperacao(dto.getEmail());
+            return ResponseEntity.ok("Email de recuperação enviado");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/resetar-senha")
+    public ResponseEntity<?> resetarSenha(@RequestBody RedefinirSenhaDTO dto) {
+        try {
+            authService.redefinirSenha(dto.getToken(), dto.getNovaSenha());
+            return ResponseEntity.ok("Senha redefinida com sucesso");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

@@ -1,20 +1,20 @@
 package com.treino_abc_backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AlunoLoginDTO {
 
+    @JsonProperty("email")
     private String email;
+
     private String password;
 
-    // Construtor padrão
     public AlunoLoginDTO() {}
 
-    // Construtor completo
     public AlunoLoginDTO(String email, String password) {
         this.email = email;
         this.password = password;
     }
-
-    // Getters e Setters
 
     public String getEmail() {
         return email;

@@ -9,28 +9,32 @@ public class TreinoExercicioAluno {
 
     @Id
     @GeneratedValue
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "aluno_id")
+    @JoinColumn(name = "grupo_id", nullable = false)
+    private TreinoGrupo grupo;
+
+    @ManyToOne
+    @JoinColumn(name = "aluno_id", nullable = false)
     private Aluno aluno;
 
-    @Column(name = "nome_exercicio")
+    @Column(name = "nome_exercicio", nullable = false)
     private String nomeExercicio;
 
     @ManyToOne
     @JoinColumn(name = "exercicio_id", referencedColumnName = "id", nullable = false)
     private Exercicio exercicio;
 
-    @ManyToOne
-    @JoinColumn(name = "grupo_id")
-    private TreinoGrupo grupo;
-
+    @Column(nullable = false)
     private int ordem;
-    private String diaSemana;
-    private String observacao;
 
-    // Getters and Setters
+    @Column(name = "dia_semana", nullable = false)
+    private String diaSemana;
+
+    @Column(length = 500)
+    private String observacao;
 
     public UUID getId() {
         return id;
@@ -40,20 +44,20 @@ public class TreinoExercicioAluno {
         this.id = id;
     }
 
-    public String getNomeExercicio() {
-        return nomeExercicio;
-    }
-
-    public void setNomeExercicio(String nomeExercicio) {
-        this.nomeExercicio = nomeExercicio;
-    }
-
     public Aluno getAluno() {
         return aluno;
     }
 
     public void setAluno(Aluno aluno) {
         this.aluno = aluno;
+    }
+
+    public String getNomeExercicio() {
+        return nomeExercicio;
+    }
+
+    public void setNomeExercicio(String nomeExercicio) {
+        this.nomeExercicio = nomeExercicio;
     }
 
     public Exercicio getExercicio() {

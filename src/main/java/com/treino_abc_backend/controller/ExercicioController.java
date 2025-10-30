@@ -1,9 +1,20 @@
 package com.treino_abc_backend.controller;
 
+import com.treino_abc_backend.dto.ExercicioDTO;
+import com.treino_abc_backend.dto.ExercicioEdicaoDTO;
 import com.treino_abc_backend.entity.Exercicio;
+import com.treino_abc_backend.entity.TreinoGrupo;
+import com.treino_abc_backend.repository.ExercicioRepository;
+import com.treino_abc_backend.repository.TreinoGrupoRepository;
 import com.treino_abc_backend.service.ExercicioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.server.ResponseStatusException;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -13,40 +24,71 @@ import java.util.UUID;
 public class ExercicioController {
 
     private final ExercicioService service;
+    private final ExercicioRepository exercicioRepository;
+    private final TreinoGrupoRepository treinoGrupoRepository;
 
-    public ExercicioController(ExercicioService service) {
+    public ExercicioController(ExercicioService service, ExercicioRepository exercicioRepository, TreinoGrupoRepository treinoGrupoRepository) {
         this.service = service;
+        this.exercicioRepository = exercicioRepository;
+        this.treinoGrupoRepository = treinoGrupoRepository;
     }
 
     @GetMapping
     public ResponseEntity<List<Exercicio>> listar(@RequestHeader("aluno-id") String alunoId) {
-        // Lista apenas os exercícios do aluno logado
         return ResponseEntity.ok(service.getPorAluno(alunoId));
     }
 
     @PostMapping
-    public ResponseEntity<Exercicio> criar(@RequestHeader("aluno-id") String alunoId,
-                                           @RequestBody Exercicio exercicio) {
-        exercicio.setAlunoId(UUID.fromString(alunoId));
-        Exercicio salvo = service.salvar(exercicio);
-        return ResponseEntity.status(201).body(salvo);
+    public ResponseEntity<ExercicioDTO> criar(@RequestHeader("aluno-id") String alunoId,
+                                              @RequestBody ExercicioDTO dto) {
+        dto.setAlunoId(UUID.fromString(alunoId));
+        Exercicio salvo = service.criarExercicio(dto);
+        return ResponseEntity.status(201).body(toDTO(salvo));
     }
 
+
     @PutMapping("/{id}")
-    public ResponseEntity<Exercicio> atualizar(@RequestHeader("aluno-id") String alunoId,
-                                               @PathVariable String id,
-                                               @RequestBody Exercicio exercicio) {
-        exercicio.setId(UUID.fromString(id));
-        return service.atualizar(exercicio, UUID.fromString(alunoId))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(403).build()); // 403 se tentar atualizar outro aluno
+    public ResponseEntity<Exercicio> atualizar(@PathVariable UUID id,
+                                               @RequestBody ExercicioEdicaoDTO dto,
+                                               @RequestHeader("aluno-id") String alunoId) {
+        // Busca o exercício existente
+        Exercicio existente = exercicioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
+
+        // Valida se o exercício pertence ao aluno
+        UUID alunoUUID = UUID.fromString(alunoId);
+        if (!existente.getAlunoId().equals(alunoUUID)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode editar exercícios de outro aluno");
+        }
+
+        // Atualiza os campos básicos
+        existente.setNome(dto.getNome());
+        existente.setGrupoMuscular(dto.getGrupoMuscular());
+        existente.setSeries(dto.getSeries());
+        existente.setRepMin(dto.getRepMin());
+        existente.setRepMax(dto.getRepMax());
+        existente.setPesoInicial(dto.getPesoInicial());
+        existente.setObservacao(dto.getObservacao());
+        existente.setAtivo(dto.isAtivo());
+
+        // Atualiza o grupo, se fornecido
+        if (dto.getGrupoId() != null) {
+            TreinoGrupo grupo = treinoGrupoRepository.findById(dto.getGrupoId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
+            existente.setGrupo(grupo);
+        }
+
+        // Salva e retorna o exercício atualizado
+        Exercicio atualizado = exercicioRepository.save(existente);
+        return ResponseEntity.ok(atualizado);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@RequestHeader("aluno-id") String alunoId,
                                         @PathVariable String id) {
         service.deletar(id, UUID.fromString(alunoId));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/treino/{treinoNome}")
@@ -63,6 +105,23 @@ public class ExercicioController {
                                                 @PathVariable String treinoNome,
                                                 @PathVariable String id) {
         service.removerDoTreino(id, UUID.fromString(alunoId));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
+    }
+
+    private ExercicioDTO toDTO(Exercicio e) {
+        ExercicioDTO dto = new ExercicioDTO();
+        dto.setId(e.getId());
+        dto.setNome(e.getNome());
+        dto.setGrupoMuscular(e.getGrupoMuscular());
+        dto.setSeries(e.getSeries());
+        dto.setRepMin(e.getRepMin());
+        dto.setRepMax(e.getRepMax());
+        dto.setPesoInicial(e.getPesoInicial());
+        dto.setObservacao(e.getObservacao());
+        dto.setAlunoId(e.getAlunoId());
+        dto.setAtivo(e.isAtivo());
+        dto.setDataCriacao(e.getDataCriacao());
+        dto.setGrupoId(e.getGrupoId());
+        return dto;
     }
 }
