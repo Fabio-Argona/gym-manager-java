@@ -61,7 +61,10 @@ public class SecurityConfig {
                                 "/alunos/login",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/exercicios/**"
+                                "/exercicios/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
                         ).permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/grupos/**").authenticated()
                         .anyRequest().authenticated()
