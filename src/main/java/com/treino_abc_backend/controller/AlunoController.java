@@ -1,5 +1,6 @@
 package com.treino_abc_backend.controller;
 
+import com.treino_abc_backend.dto.AlunoDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.security.JwtUtil;
@@ -36,8 +37,19 @@ public class AlunoController {
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable UUID id) {
         return alunoRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(404).body((Aluno) Map.of("erro", "Aluno não encontrado")));
+                .map(aluno -> {
+                    AlunoDTO dto = new AlunoDTO(
+                            aluno.getId(),
+                            aluno.getNome(),
+                            aluno.getCpf(),
+                            aluno.getEmail(),
+                            aluno.getTelefone(),
+                            aluno.getDataNascimento(),
+                            aluno.getLogin()
+                    );
+                    return ResponseEntity.ok(dto);
+                })
+                .orElse(ResponseEntity.status(404).body((AlunoDTO) Map.of("erro", "Aluno não encontrado")));
     }
 
     @PutMapping("/{id}/nome")
@@ -62,4 +74,6 @@ public class AlunoController {
                 })
                 .orElse(ResponseEntity.status(404).body(Map.of("erro", "Aluno não encontrado")));
     }
+
+
 }
