@@ -21,17 +21,17 @@ public class UploadController {
         this.uploadService = uploadService;
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadImagem(@RequestParam("foto") MultipartFile file) {
+    @PostMapping("/upload/{id}")
+    public ResponseEntity<String> uploadImagem(@RequestParam("foto") MultipartFile file, @PathVariable String id) {
         try {
-            String nomeArquivo = uploadService.salvarImagem(file);
-            String url = "http://18.222.56.92:8080/uploads/" + nomeArquivo;
+            String nomeArquivo = uploadService.salvarImagem(file, id);
+            String url = "http://18.222.56.92:8080/api/uploads/" + nomeArquivo;
             return ResponseEntity.ok(url);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body("Erro ao salvar imagem: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Erro ao salvar imagem: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/uploads/{filename}")
     public ResponseEntity<Resource> getImagem(@PathVariable String filename) {
