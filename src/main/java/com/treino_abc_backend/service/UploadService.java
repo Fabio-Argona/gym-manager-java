@@ -13,25 +13,26 @@ public class UploadService {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-    public String salvarImagem(MultipartFile file) throws IOException {
+    public String salvarImagem(MultipartFile file, String alunoId) throws IOException {
         String tipo = file.getContentType();
         if (tipo == null || !tipo.startsWith("image/")) {
             throw new IOException("Tipo de arquivo não suportado: " + tipo);
         }
 
-        Path uploadPath = Paths.get(UPLOAD_DIR);
+        Path uploadPath = Paths.get("uploads");
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
         String extensao = getExtensao(Objects.requireNonNull(file.getOriginalFilename()));
-        String nomeUnico = UUID.randomUUID().toString() + "." + extensao;
-        Path destino = uploadPath.resolve(nomeUnico);
+        String nomeArquivo = alunoId + "." + extensao;
+        Path destino = uploadPath.resolve(nomeArquivo);
 
         Files.copy(file.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 
-        return nomeUnico;
+        return nomeArquivo;
     }
+
 
     private String getExtensao(String nomeArquivo) {
         int ponto = nomeArquivo.lastIndexOf('.');
