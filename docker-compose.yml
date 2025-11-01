@@ -34,3 +34,5 @@ services:
     volumes:
       - ./uploads:/app/uploads
 
+volumes:
+  pgdata: {}
