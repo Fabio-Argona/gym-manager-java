@@ -2,10 +2,10 @@ package com.treino_abc_backend.controller;
 
 import com.treino_abc_backend.service.UploadService;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
@@ -21,6 +21,7 @@ public class UploadController {
         this.uploadService = uploadService;
     }
 
+    // 📤 Upload da imagem do aluno
     @PostMapping("/upload/{id}")
     public ResponseEntity<String> uploadImagem(@RequestParam("foto") MultipartFile file, @PathVariable String id) {
         try {
@@ -32,7 +33,7 @@ public class UploadController {
         }
     }
 
-
+    // 🖼️ Retorna a imagem para exibição no avatar
     @GetMapping("/uploads/{filename}")
     public ResponseEntity<Resource> getImagem(@PathVariable String filename) {
         try {
@@ -40,8 +41,13 @@ public class UploadController {
             Resource imagem = new UrlResource(caminho.toUri());
 
             if (imagem.exists() && imagem.isReadable()) {
+                // Detecta extensão para definir tipo MIME corretamente
+                MediaType tipoImagem = filename.toLowerCase().endsWith(".png")
+                        ? MediaType.IMAGE_PNG
+                        : MediaType.IMAGE_JPEG;
+
                 return ResponseEntity.ok()
-                        .contentType(MediaType.IMAGE_JPEG)
+                        .contentType(tipoImagem)
                         .body(imagem);
             } else {
                 return ResponseEntity.notFound().build();
