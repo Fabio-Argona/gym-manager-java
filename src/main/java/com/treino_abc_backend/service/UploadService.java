@@ -6,7 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class UploadService {
@@ -15,11 +14,12 @@ public class UploadService {
 
     public String salvarImagem(MultipartFile file, String alunoId) throws IOException {
         String tipo = file.getContentType();
-        if (tipo == null || !tipo.startsWith("image/")) {
+        
+        if (tipo == null || (!tipo.startsWith("image/") && !tipo.equals("application/octet-stream"))) {
             throw new IOException("Tipo de arquivo não suportado: " + tipo);
         }
 
-        Path uploadPath = Paths.get("uploads");
+        Path uploadPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
@@ -32,7 +32,6 @@ public class UploadService {
 
         return nomeArquivo;
     }
-
 
     private String getExtensao(String nomeArquivo) {
         int ponto = nomeArquivo.lastIndexOf('.');
