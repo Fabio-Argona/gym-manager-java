@@ -28,7 +28,7 @@ jobs:
           source: "."
           target: "~/app/gym-manager-java"
 
-      - name: Rodar docker-compose na EC2
+      - name: Rodar docker-compose na EC2 com limpeza
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -36,5 +36,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/app/gym-manager-java
-            docker-compose down
+            echo "🧹 Limpando Docker antigo..."
+            docker-compose down --volumes --remove-orphans
+            docker system prune -af
+            docker volume prune -f
+            echo "🚀 Subindo containers atualizados..."
             docker-compose up -d --build
