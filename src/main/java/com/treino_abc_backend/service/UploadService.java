@@ -14,7 +14,7 @@ public class UploadService {
 
     public String salvarImagem(MultipartFile file, String alunoId) throws IOException {
         String tipo = file.getContentType();
-        
+
         if (tipo == null || (!tipo.startsWith("image/") && !tipo.equals("application/octet-stream"))) {
             throw new IOException("Tipo de arquivo não suportado: " + tipo);
         }
