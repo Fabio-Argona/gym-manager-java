@@ -142,8 +142,13 @@ public class ExercicioService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
 
         exercicio.setAtivo(ativo);
+        if (!ativo) {
+            exercicio.setGrupo(null);
+        }
+
         return Optional.of(repository.save(exercicio));
     }
+
 
     private void validarAluno(Exercicio exercicio) {
         if (exercicio.getAlunoId() == null) {
