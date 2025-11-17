@@ -73,17 +73,14 @@ public class TreinoGrupoService {
     }
 
     public void excluirGrupoComExercicios(UUID grupoId) {
-        // 1. Buscar vínculos de exercícios com o grupo
         List<TreinoExercicioAluno> vinculados = treinoRepo.findByGrupo_Id(grupoId);
-
-        // 2. Excluir vínculos fisicamente
-        treinoRepo.deleteAll(vinculados);
-
-        // 3. Excluir o grupo
-        if (!grupoRepo.existsById(grupoId)) {
-            throw new IllegalArgumentException("Grupo não encontrado");
+        for (TreinoExercicioAluno t : vinculados) {
+            t.setGrupo(null);
         }
-        grupoRepo.deleteById(grupoId);
+        treinoRepo.saveAll(vinculados);
+        TreinoGrupo grupo = grupoRepo.findById(grupoId)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
+        grupoRepo.delete(grupo);
     }
-
+    
 }
