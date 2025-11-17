@@ -104,10 +104,13 @@ public class ExercicioService {
             TreinoGrupo grupo = grupoRepository.findById(novo.getGrupoId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
             existente.setGrupo(grupo);
+        } else {
+            existente.setGrupo(null);
         }
 
         return Optional.of(repository.save(existente));
     }
+
 
     public void deletar(String id, UUID alunoId) {
         Exercicio exercicio = repository.findById(UUID.fromString(id))
