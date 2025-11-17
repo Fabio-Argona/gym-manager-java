@@ -143,6 +143,22 @@ public class TreinoService {
                 ));
     }
 
+    public void excluirGrupoComExercicios(UUID grupoId) {
+        // 1. Buscar todos os vínculos de exercícios com o grupo
+        List<TreinoExercicioAluno> vinculados = treinoRepo.findByGrupo_Id(grupoId);
+
+        // 2. Excluir vínculos
+        treinoRepo.deleteAll(vinculados);
+
+        // 3. Excluir o grupo
+        if (!grupoRepo.existsById(grupoId)) {
+            throw new IllegalArgumentException("Grupo não encontrado");
+        }
+        grupoRepo.deleteById(grupoId);
+    }
+
+
+
 
 
 }

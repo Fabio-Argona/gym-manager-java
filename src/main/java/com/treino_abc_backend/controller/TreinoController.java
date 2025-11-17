@@ -64,6 +64,16 @@ public class TreinoController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{id}/com-exercicios")
+    public ResponseEntity<?> excluirGrupoComExercicios(@PathVariable UUID id) {
+        try {
+            treinoService.excluirGrupoComExercicios(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao excluir grupo e exercícios: " + e.getMessage());
+        }
+    }
+
     @GetMapping
     public ResponseEntity<?> listarTreinosDoAluno(@RequestHeader("Authorization") String authHeader) {
         try {
