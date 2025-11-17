@@ -47,4 +47,15 @@ public class TreinoGrupoController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @DeleteMapping("/{id}/com-exercicios")
+    public ResponseEntity<?> excluirGrupoComExercicios(@PathVariable UUID id) {
+        try {
+            grupoService.excluirGrupoComExercicios(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao excluir grupo e exercícios: " + e.getMessage());
+        }
+    }
+
 }

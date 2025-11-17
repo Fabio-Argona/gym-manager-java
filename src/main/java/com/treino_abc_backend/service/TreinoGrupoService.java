@@ -2,8 +2,10 @@ package com.treino_abc_backend.service;
 
 import com.treino_abc_backend.dto.TreinoGrupoDTO;
 import com.treino_abc_backend.entity.Aluno;
+import com.treino_abc_backend.entity.TreinoExercicioAluno;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.AlunoRepository;
+import com.treino_abc_backend.repository.TreinoExercicioAlunoRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +18,12 @@ public class TreinoGrupoService {
 
     private final TreinoGrupoRepository grupoRepo;
     private final AlunoRepository alunoRepo;
+    private final TreinoExercicioAlunoRepository treinoRepo;
 
-    public TreinoGrupoService(TreinoGrupoRepository grupoRepo, AlunoRepository alunoRepo) {
+    public TreinoGrupoService(TreinoGrupoRepository grupoRepo, AlunoRepository alunoRepo, TreinoExercicioAlunoRepository treinoRepo) {
         this.grupoRepo = grupoRepo;
         this.alunoRepo = alunoRepo;
+        this.treinoRepo = treinoRepo;
     }
 
     public TreinoGrupoDTO criar(TreinoGrupoDTO dto) {
@@ -67,4 +71,19 @@ public class TreinoGrupoService {
                 grupo.getNome()
         );
     }
+
+    public void excluirGrupoComExercicios(UUID grupoId) {
+        // 1. Buscar vínculos de exercícios com o grupo
+        List<TreinoExercicioAluno> vinculados = treinoRepo.findByGrupo_Id(grupoId);
+
+        // 2. Excluir vínculos fisicamente
+        treinoRepo.deleteAll(vinculados);
+
+        // 3. Excluir o grupo
+        if (!grupoRepo.existsById(grupoId)) {
+            throw new IllegalArgumentException("Grupo não encontrado");
+        }
+        grupoRepo.deleteById(grupoId);
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.treino_abc_backend.repository;
 
+import com.treino_abc_backend.entity.TreinoExercicioAluno;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
