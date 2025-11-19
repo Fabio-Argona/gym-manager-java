@@ -1,6 +1,8 @@
 package com.treino_abc_backend.controller;
 
 import com.treino_abc_backend.dto.AlunoDTO;
+import com.treino_abc_backend.dto.AlunoRegisterDTO;
+import com.treino_abc_backend.dto.AlunoSenhaDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.security.JwtUtil;
@@ -74,6 +76,41 @@ public class AlunoController {
                 })
                 .orElse(ResponseEntity.status(404).body(Map.of("erro", "Aluno não encontrado")));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizar(@PathVariable UUID id, @RequestBody AlunoRegisterDTO dto) {
+        try {
+            return ResponseEntity.ok(alunoService.atualizar(id, dto));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("erro", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/senha")
+    public ResponseEntity<?> atualizarSenha(@PathVariable UUID id, @RequestBody AlunoSenhaDTO dto) {
+        try {
+            alunoService.atualizarSenha(id, dto.getSenha());
+            return ResponseEntity.ok(Map.of("mensagem", "Senha atualizada com sucesso"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("erro", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/login")
+    public ResponseEntity<?> atualizarLogin(@PathVariable UUID id, @RequestBody Map<String, String> body) {
+        try {
+            String novoLogin = body.get("login");
+            alunoService.atualizarLogin(id, novoLogin);
+            return ResponseEntity.ok(Map.of("mensagem", "Login atualizado com sucesso"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("erro", e.getMessage()));
+        }
+    }
+
+
+
+
+
 
 
 }

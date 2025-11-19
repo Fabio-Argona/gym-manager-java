@@ -77,4 +77,46 @@ public class AlunoService {
         dto.setLogin(aluno.getLogin());
         return dto;
     }
+
+    public AlunoDTO atualizar(UUID id, AlunoRegisterDTO dto) {
+
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        aluno.setNome(dto.getNome());
+        aluno.setCpf(dto.getCpf());
+        aluno.setEmail(dto.getEmail());
+        aluno.setTelefone(dto.getTelefone());
+        aluno.setDataNascimento(dto.getDataNascimento());
+        aluno.setLogin(dto.getLogin());
+
+        alunoRepository.save(aluno);
+
+        return toDTO(aluno);
+    }
+
+    public void atualizarSenha(UUID id, String novaSenha) {
+
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        aluno.setPassword(passwordEncoder.encode(novaSenha));
+
+        alunoRepository.save(aluno);
+    }
+
+    public void atualizarLogin(UUID id, String novoLogin) {
+
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        aluno.setLogin(novoLogin);
+
+        alunoRepository.save(aluno);
+    }
+
+
+
+
+
 }
