@@ -1,18 +1,19 @@
 package com.treino_abc_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import java.util.List;
 import java.util.UUID;
+import java.time.LocalDate;
 
 public class TreinoDTO {
 
     private UUID id;
 
-    @JsonProperty("grupo_id")
-    private UUID grupoId;
-
     @JsonProperty("aluno_id")
     private UUID alunoId;
+
+    @JsonProperty("grupo_id")
+    private UUID grupoId;
 
     @JsonProperty("exercicio_id")
     private UUID exercicioId;
@@ -22,11 +23,9 @@ public class TreinoDTO {
 
     private Integer series;
 
-    @JsonProperty("rep_min")
-    private Integer repMin;
+    @JsonProperty("repeticoes")
+    private Integer repeticoes;
 
-    @JsonProperty("rep_max")
-    private Integer repMax;
 
     @JsonProperty("peso_inicial")
     private Double pesoInicial;
@@ -38,23 +37,24 @@ public class TreinoDTO {
 
     private String observacao;
 
-    public TreinoDTO() {}
+    @JsonProperty("datas_treinadas")
+    private List<LocalDate> datasTreinadas;
 
-    public TreinoDTO(UUID id, UUID grupoId, UUID alunoId, UUID exercicioId, String nomeExercicio,
-                     Integer series, Integer repMin, Integer repMax, Double pesoInicial,
-                     String diaSemana, Integer ordem, String observacao) {
+    // Construtores, getters e setters
+
+    public TreinoDTO(UUID id, UUID alunoId, UUID grupoId, UUID exercicioId, String nomeExercicio, Integer series, Integer repMin, Integer repMax, Double pesoInicial, String diaSemana, Integer ordem, String observacao, List<LocalDate> datasTreinadas) {
         this.id = id;
-        this.grupoId = grupoId;
         this.alunoId = alunoId;
+        this.grupoId = grupoId;
         this.exercicioId = exercicioId;
         this.nomeExercicio = nomeExercicio;
         this.series = series;
-        this.repMin = repMin;
-        this.repMax = repMax;
+        this.repeticoes = repMin;
         this.pesoInicial = pesoInicial;
         this.diaSemana = diaSemana;
         this.ordem = ordem;
         this.observacao = observacao;
+        this.datasTreinadas = datasTreinadas;
     }
 
     public UUID getId() {
@@ -65,20 +65,20 @@ public class TreinoDTO {
         this.id = id;
     }
 
-    public UUID getGrupoId() {
-        return grupoId;
-    }
-
-    public void setGrupoId(UUID grupoId) {
-        this.grupoId = grupoId;
-    }
-
     public UUID getAlunoId() {
         return alunoId;
     }
 
     public void setAlunoId(UUID alunoId) {
         this.alunoId = alunoId;
+    }
+
+    public UUID getGrupoId() {
+        return grupoId;
+    }
+
+    public void setGrupoId(UUID grupoId) {
+        this.grupoId = grupoId;
     }
 
     public UUID getExercicioId() {
@@ -105,21 +105,14 @@ public class TreinoDTO {
         this.series = series;
     }
 
-    public Integer getRepMin() {
-        return repMin;
+    public Integer getRepeticoes() {
+        return repeticoes;
     }
 
-    public void setRepMin(Integer repMin) {
-        this.repMin = repMin;
+    public void setRepeticoes(Integer repeticoes) {
+        this.repeticoes = repeticoes;
     }
 
-    public Integer getRepMax() {
-        return repMax;
-    }
-
-    public void setRepMax(Integer repMax) {
-        this.repMax = repMax;
-    }
 
     public Double getPesoInicial() {
         return pesoInicial;
@@ -151,5 +144,13 @@ public class TreinoDTO {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public List<LocalDate> getDatasTreinadas() {
+        return datasTreinadas;
+    }
+
+    public void setDatasTreinadas(List<LocalDate> datasTreinadas) {
+        this.datasTreinadas = datasTreinadas;
     }
 }

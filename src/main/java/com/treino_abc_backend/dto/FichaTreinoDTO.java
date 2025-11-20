@@ -12,11 +12,8 @@ public class FichaTreinoDTO {
 
     private Integer series;
 
-    @JsonProperty("rep_min")
-    private Integer repMin;
-
-    @JsonProperty("rep_max")
-    private Integer repMax;
+    @JsonProperty("repeticoes")
+    private Integer repeticoes;
 
     @JsonProperty("peso_inicial")
     private Double pesoInicial;
@@ -25,16 +22,16 @@ public class FichaTreinoDTO {
 
     public FichaTreinoDTO() {}
 
-    public FichaTreinoDTO(String exercicio, String grupoMuscular, Integer series,
-                          Integer repMin, Integer repMax, Double pesoInicial, String observacao) {
+    public FichaTreinoDTO(String exercicio, String grupoMuscular, int series,
+                          int repeticoes, Double pesoInicial, String observacao) {
         this.exercicio = exercicio;
         this.grupoMuscular = grupoMuscular;
         this.series = series;
-        this.repMin = repMin;
-        this.repMax = repMax;
+        this.repeticoes = repeticoes;
         this.pesoInicial = pesoInicial;
         this.observacao = observacao;
     }
+
 
     public String getExercicio() {
         return exercicio;
@@ -60,20 +57,12 @@ public class FichaTreinoDTO {
         this.series = series;
     }
 
-    public Integer getRepMin() {
-        return repMin;
+    public Integer repeticoes() {
+        return repeticoes;
     }
 
-    public void setRepMin(Integer repMin) {
-        this.repMin = repMin;
-    }
-
-    public Integer getRepMax() {
-        return repMax;
-    }
-
-    public void setRepMax(Integer repMax) {
-        this.repMax = repMax;
+    public void repeticoes(Integer repeticoes) {
+        this.repeticoes = repeticoes;
     }
 
     public Double getPesoInicial() {

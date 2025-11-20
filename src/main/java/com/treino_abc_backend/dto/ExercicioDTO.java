@@ -1,8 +1,6 @@
 package com.treino_abc_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.treino_abc_backend.entity.Exercicio;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,11 +18,7 @@ public class ExercicioDTO {
 
     private Integer series;
 
-    @JsonProperty("rep_min")
-    private Integer repMin;
-
-    @JsonProperty("rep_max")
-    private Integer repMax;
+    private Integer repeticoes; // Substitui repMin e repMax
 
     @JsonProperty("peso_inicial")
     private Double pesoInicial;
@@ -41,103 +35,36 @@ public class ExercicioDTO {
     private LocalDateTime dataCriacao;
 
     // Getters e Setters
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public UUID getId() {
-        return id;
-    }
+    public UUID getGrupoId() { return grupoId; }
+    public void setGrupoId(UUID grupoId) { this.grupoId = grupoId; }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public UUID getGrupoId() {
-        return grupoId;
-    }
+    public String getGrupoMuscular() { return grupoMuscular; }
+    public void setGrupoMuscular(String grupoMuscular) { this.grupoMuscular = grupoMuscular; }
 
-    public void setGrupoId(UUID grupoId) {
-        this.grupoId = grupoId;
-    }
+    public Integer getSeries() { return series; }
+    public void setSeries(Integer series) { this.series = series; }
 
-    public String getNome() {
-        return nome;
-    }
+    public Integer getRepeticoes() { return repeticoes; }
+    public void setRepeticoes(Integer repeticoes) { this.repeticoes = repeticoes; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public Double getPesoInicial() { return pesoInicial; }
+    public void setPesoInicial(Double pesoInicial) { this.pesoInicial = pesoInicial; }
 
-    public String getGrupoMuscular() {
-        return grupoMuscular;
-    }
+    public String getObservacao() { return observacao; }
+    public void setObservacao(String observacao) { this.observacao = observacao; }
 
-    public void setGrupoMuscular(String grupoMuscular) {
-        this.grupoMuscular = grupoMuscular;
-    }
+    public UUID getAlunoId() { return alunoId; }
+    public void setAlunoId(UUID alunoId) { this.alunoId = alunoId; }
 
-    public Integer getSeries() {
-        return series;
-    }
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
 
-    public void setSeries(Integer series) {
-        this.series = series;
-    }
-
-    public Integer getRepMin() {
-        return repMin;
-    }
-
-    public void setRepMin(Integer repMin) {
-        this.repMin = repMin;
-    }
-
-    public Integer getRepMax() {
-        return repMax;
-    }
-
-    public void setRepMax(Integer repMax) {
-        this.repMax = repMax;
-    }
-
-    public Double getPesoInicial() {
-        return pesoInicial;
-    }
-
-    public void setPesoInicial(Double pesoInicial) {
-        this.pesoInicial = pesoInicial;
-    }
-
-    public String getObservacao() {
-        return observacao;
-    }
-
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
-    }
-
-    public UUID getAlunoId() {
-        return alunoId;
-    }
-
-    public void setAlunoId(UUID alunoId) {
-        this.alunoId = alunoId;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    public LocalDateTime getDataCriacao() {
-        return dataCriacao;
-    }
-
-    public void setDataCriacao(LocalDateTime dataCriacao) {
-        this.dataCriacao = dataCriacao;
-    }
-
-
-
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
+    public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
 }

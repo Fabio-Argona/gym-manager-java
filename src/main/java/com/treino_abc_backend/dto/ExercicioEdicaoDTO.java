@@ -7,13 +7,12 @@ public class ExercicioEdicaoDTO {
     private UUID grupoId;
     private String grupoMuscular;
     private int series;
-    private int repMin;
-    private int repMax;
+    private int repeticoes;  // Substitui repMin e repMax
     private Double pesoInicial;
     private String observacao;
     private boolean ativo;
 
-    // Getters e setters
+    // ===================== Getters e Setters =====================
 
     public String getNome() {
         return nome;
@@ -47,20 +46,12 @@ public class ExercicioEdicaoDTO {
         this.series = series;
     }
 
-    public int getRepMin() {
-        return repMin;
+    public int getRepeticoes() {
+        return repeticoes;
     }
 
-    public void setRepMin(int repMin) {
-        this.repMin = repMin;
-    }
-
-    public int getRepMax() {
-        return repMax;
-    }
-
-    public void setRepMax(int repMax) {
-        this.repMax = repMax;
+    public void setRepeticoes(int repeticoes) {
+        this.repeticoes = repeticoes;
     }
 
     public Double getPesoInicial() {

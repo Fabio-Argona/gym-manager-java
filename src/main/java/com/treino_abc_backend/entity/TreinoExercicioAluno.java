@@ -1,102 +1,89 @@
 package com.treino_abc_backend.entity;
 
 import jakarta.persistence.*;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 
 @Entity
-@Table(name = "treino_exercicio_aluno")
 public class TreinoExercicioAluno {
 
     @Id
-    @GeneratedValue
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "grupo_id", nullable = false)
-    private TreinoGrupo grupo;
+    private UUID alunoId;
 
     @ManyToOne
-    @JoinColumn(name = "aluno_id", nullable = false)
-    private Aluno aluno;
-
-    @Column(name = "nome_exercicio", nullable = false)
-    private String nomeExercicio;
-
-    @ManyToOne
-    @JoinColumn(name = "exercicio_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "exercicio_id")
     private Exercicio exercicio;
 
-    @Column(nullable = false)
-    private int ordem;
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    private TreinoGrupo grupo;
 
-    @Column(name = "dia_semana", nullable = false)
+    // --- CAMPOS QUE O SERVICE USA ---
     private String diaSemana;
 
-    @Column(length = 500)
+    private Integer ordem;
+
     private String observacao;
 
-    public UUID getId() {
-        return id;
-    }
+    private String nomeExercicio;
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    private Integer series;
 
-    public Aluno getAluno() {
-        return aluno;
-    }
+    private Integer repeticoes;
 
-    public void setAluno(Aluno aluno) {
-        this.aluno = aluno;
-    }
+    private Double pesoInicial;
 
-    public String getNomeExercicio() {
-        return nomeExercicio;
-    }
+    // Datas que já foram treinadas
+    @ElementCollection
+    @CollectionTable(
+            name = "treino_datas",
+            joinColumns = @JoinColumn(name = "treino_id")
+    )
+    @Column(name = "data_treino")
+    private List<LocalDate> datasTreinadas = new ArrayList<>();
 
-    public void setNomeExercicio(String nomeExercicio) {
-        this.nomeExercicio = nomeExercicio;
-    }
+    public TreinoExercicioAluno() {}
 
-    public Exercicio getExercicio() {
-        return exercicio;
-    }
+    // ----------------------------------
+    // GETTERS E SETTERS
+    // ----------------------------------
 
-    public void setExercicio(Exercicio exercicio) {
-        this.exercicio = exercicio;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public TreinoGrupo getGrupo() {
-        return grupo;
-    }
+    public UUID getAlunoId() { return alunoId; }
+    public void setAlunoId(UUID alunoId) { this.alunoId = alunoId; }
 
-    public void setGrupo(TreinoGrupo grupo) {
-        this.grupo = grupo;
-    }
+    public Exercicio getExercicio() { return exercicio; }
+    public void setExercicio(Exercicio exercicio) { this.exercicio = exercicio; }
 
-    public int getOrdem() {
-        return ordem;
-    }
+    public TreinoGrupo getGrupo() { return grupo; }
+    public void setGrupo(TreinoGrupo grupo) { this.grupo = grupo; }
 
-    public void setOrdem(int ordem) {
-        this.ordem = ordem;
-    }
+    public String getDiaSemana() { return diaSemana; }
+    public void setDiaSemana(String diaSemana) { this.diaSemana = diaSemana; }
 
-    public String getDiaSemana() {
-        return diaSemana;
-    }
+    public Integer getOrdem() { return ordem; }
+    public void setOrdem(Integer ordem) { this.ordem = ordem; }
 
-    public void setDiaSemana(String diaSemana) {
-        this.diaSemana = diaSemana;
-    }
+    public String getObservacao() { return observacao; }
+    public void setObservacao(String observacao) { this.observacao = observacao; }
 
-    public String getObservacao() {
-        return observacao;
-    }
+    public String getNomeExercicio() { return nomeExercicio; }
+    public void setNomeExercicio(String nomeExercicio) { this.nomeExercicio = nomeExercicio; }
 
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
-    }
+    public Integer getSeries() { return series; }
+    public void setSeries(Integer series) { this.series = series; }
+
+    public Integer getRepeticoes() { return repeticoes; }
+    public void setRepeticoes(Integer repeticoes) { this.repeticoes = repeticoes; }
+
+    public Double getPesoInicial() { return pesoInicial; }
+    public void setPesoInicial(Double pesoInicial) { this.pesoInicial = pesoInicial; }
+
+    public List<LocalDate> getDatasTreinadas() { return datasTreinadas; }
+    public void setDatasTreinadas(List<LocalDate> datasTreinadas) { this.datasTreinadas = datasTreinadas; }
 }

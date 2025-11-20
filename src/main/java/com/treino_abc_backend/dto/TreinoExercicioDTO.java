@@ -1,7 +1,8 @@
 package com.treino_abc_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public class TreinoExercicioDTO {
@@ -17,29 +18,33 @@ public class TreinoExercicioDTO {
 
     private int series;
 
-    @JsonProperty("rep_min")
-    private int repMin;
-
-    @JsonProperty("rep_max")
-    private int repMax;
+    // Ajustado: agora usa "repeticoes" igual ao service
+    private int repeticoes;
 
     @JsonProperty("peso_inicial")
     private double pesoInicial;
 
     private String observacao;
 
-    public TreinoExercicioDTO() {}
+    @JsonProperty("datas_treinadas")
+    private List<LocalDate> datasTreinadas;
 
-    public TreinoExercicioDTO(String nomeExercicio, String grupoMuscular, int series,
-                              int repMin, int repMax, double pesoInicial, String observacao) {
+    // Construtor completo
+    public TreinoExercicioDTO(UUID grupoId, String nomeExercicio, String grupoMuscular,
+                              int series, int repeticoes, double pesoInicial,
+                              String observacao, List<LocalDate> datasTreinadas) {
+        this.grupoId = grupoId;
         this.nomeExercicio = nomeExercicio;
         this.grupoMuscular = grupoMuscular;
         this.series = series;
-        this.repMin = repMin;
-        this.repMax = repMax;
+        this.repeticoes = repeticoes;
         this.pesoInicial = pesoInicial;
         this.observacao = observacao;
+        this.datasTreinadas = datasTreinadas;
     }
+
+    // Construtor vazio
+    public TreinoExercicioDTO() {}
 
     public UUID getGrupoId() {
         return grupoId;
@@ -73,20 +78,12 @@ public class TreinoExercicioDTO {
         this.series = series;
     }
 
-    public int getRepMin() {
-        return repMin;
+    public int getRepeticoes() {
+        return repeticoes;
     }
 
-    public void setRepMin(int repMin) {
-        this.repMin = repMin;
-    }
-
-    public int getRepMax() {
-        return repMax;
-    }
-
-    public void setRepMax(int repMax) {
-        this.repMax = repMax;
+    public void setRepeticoes(int repeticoes) {
+        this.repeticoes = repeticoes;
     }
 
     public double getPesoInicial() {
@@ -103,5 +100,13 @@ public class TreinoExercicioDTO {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public List<LocalDate> getDatasTreinadas() {
+        return datasTreinadas;
+    }
+
+    public void setDatasTreinadas(List<LocalDate> datasTreinadas) {
+        this.datasTreinadas = datasTreinadas;
     }
 }

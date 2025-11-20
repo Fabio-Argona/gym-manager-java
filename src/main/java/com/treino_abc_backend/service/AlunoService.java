@@ -1,6 +1,7 @@
 package com.treino_abc_backend.service;
 
 import com.treino_abc_backend.dto.AlunoDTO;
+import com.treino_abc_backend.dto.AlunoHistoricoDTO;
 import com.treino_abc_backend.dto.AlunoRegisterDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.repository.AlunoRepository;
@@ -41,15 +42,27 @@ public class AlunoService {
         return toDTO(saved);
     }
 
-    public Aluno findByEmail(String email) {
-        return alunoRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado com email: " + email));
-    }
-
     public AlunoDTO buscarPorId(UUID id) {
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
         return toDTO(aluno);
+    }
+
+    public AlunoHistoricoDTO buscarComHistorico(UUID id) {
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
+
+        AlunoHistoricoDTO dto = new AlunoHistoricoDTO();
+        dto.setId(aluno.getId());
+        dto.setNome(aluno.getNome());
+        dto.setCpf(aluno.getCpf());
+        dto.setEmail(aluno.getEmail());
+        dto.setTelefone(aluno.getTelefone());
+        dto.setDataNascimento(aluno.getDataNascimento());
+        dto.setLogin(aluno.getLogin());
+        dto.setEvolucoes(aluno.getEvolucoes());
+
+        return dto;
     }
 
     public List<AlunoDTO> listarTodos() {
@@ -66,20 +79,7 @@ public class AlunoService {
         return nome;
     }
 
-    private AlunoDTO toDTO(Aluno aluno) {
-        AlunoDTO dto = new AlunoDTO();
-        dto.setId(aluno.getId());
-        dto.setNome(aluno.getNome());
-        dto.setCpf(aluno.getCpf());
-        dto.setEmail(aluno.getEmail());
-        dto.setTelefone(aluno.getTelefone());
-        dto.setDataNascimento(aluno.getDataNascimento());
-        dto.setLogin(aluno.getLogin());
-        return dto;
-    }
-
     public AlunoDTO atualizar(UUID id, AlunoRegisterDTO dto) {
-
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
@@ -96,27 +96,30 @@ public class AlunoService {
     }
 
     public void atualizarSenha(UUID id, String novaSenha) {
-
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         aluno.setPassword(passwordEncoder.encode(novaSenha));
-
         alunoRepository.save(aluno);
     }
 
     public void atualizarLogin(UUID id, String novoLogin) {
-
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         aluno.setLogin(novoLogin);
-
         alunoRepository.save(aluno);
     }
 
-
-
-
-
+    private AlunoDTO toDTO(Aluno aluno) {
+        AlunoDTO dto = new AlunoDTO();
+        dto.setId(aluno.getId());
+        dto.setNome(aluno.getNome());
+        dto.setCpf(aluno.getCpf());
+        dto.setEmail(aluno.getEmail());
+        dto.setTelefone(aluno.getTelefone());
+        dto.setDataNascimento(aluno.getDataNascimento());
+        dto.setLogin(aluno.getLogin());
+        return dto;
+    }
 }

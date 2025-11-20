@@ -1,14 +1,17 @@
 package com.treino_abc_backend.controller;
 
+import com.treino_abc_backend.dto.ExercicioDTO;
 import com.treino_abc_backend.dto.TreinoGrupoDTO;
 import com.treino_abc_backend.entity.Exercicio;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.security.JwtUtil;
 import com.treino_abc_backend.service.ExercicioService;
+import com.treino_abc_backend.service.TreinoRealizadoService;
 import com.treino_abc_backend.service.TreinoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,26 +25,26 @@ public class TreinoController {
     private final TreinoService treinoService;
     private final JwtUtil jwtUtil;
     private final AlunoRepository alunoRepo;
+    private final TreinoRealizadoService realizadoService;
 
-    public TreinoController(
-            ExercicioService exercicioService,
-            TreinoService treinoService,
-            JwtUtil jwtUtil,
-            AlunoRepository alunoRepo
-    ) {
+    public TreinoController(ExercicioService exercicioService, TreinoService treinoService, JwtUtil jwtUtil, AlunoRepository alunoRepo, TreinoRealizadoService realizadoService) {
         this.exercicioService = exercicioService;
         this.treinoService = treinoService;
         this.jwtUtil = jwtUtil;
         this.alunoRepo = alunoRepo;
+        this.realizadoService = realizadoService;
     }
 
+
     @GetMapping("/{treinoNome}")
-    public ResponseEntity<List<Exercicio>> listarPorTreino(
+    public ResponseEntity<List<ExercicioDTO>> listarPorTreino(
             @RequestHeader("aluno-id") String alunoId,
             @PathVariable String treinoNome
     ) {
-        return ResponseEntity.ok(exercicioService.getPorAluno(alunoId));
+        UUID alunoUUID = UUID.fromString(alunoId);
+        return ResponseEntity.ok(exercicioService.getPorAluno(alunoUUID));
     }
+
 
     @PostMapping("/{treinoNome}")
     public ResponseEntity<Exercicio> adicionar(
@@ -100,4 +103,19 @@ public class TreinoController {
         return ResponseEntity.ok(exercicioOpt.get());
     }
 
-}
+    @PostMapping("/realizado/{treinoId}")
+        public ResponseEntity<?> registrarTreino(
+                @PathVariable UUID treinoId,
+                @RequestParam(required = false) String data // yyyy-MM-dd
+        ) {
+            LocalDate dia = data != null ? LocalDate.parse(data) : LocalDate.now();
+            return ResponseEntity.ok(realizadoService.registrar(treinoId, dia));
+        }
+
+        // Listar datas de treinos de um aluno
+        @GetMapping("/realizados/{alunoId}")
+        public ResponseEntity<List<LocalDate>> listarDatasTreinadas(@PathVariable UUID alunoId) {
+            return ResponseEntity.ok(realizadoService.getDatasTreinadas(alunoId));
+        }
+    }
+

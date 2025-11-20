@@ -1,31 +1,21 @@
-package com.treino_abc_backend.entity;
+package com.treino_abc_backend.dto;
 
-import jakarta.persistence.*;
+import com.treino_abc_backend.entity.EvolucaoMedidas;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
-@Table(name = "alunos")
-public class Aluno {
+public class AlunoHistoricoDTO {
 
-    @Id
-    @GeneratedValue
-    @Column(columnDefinition = "uuid", updatable = false)
     private UUID id;
-
     private String nome;
     private String cpf;
     private String email;
     private String telefone;
     private LocalDate dataNascimento;
     private String login;
-    private String password;
-    private String role;
 
-    @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EvolucaoMedidas> evolucoes = new ArrayList<>();
+    private List<EvolucaoMedidas> evolucoes;
 
     // Getters e Setters
     public UUID getId() { return id; }
@@ -48,12 +38,6 @@ public class Aluno {
 
     public String getLogin() { return login; }
     public void setLogin(String login) { this.login = login; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
 
     public List<EvolucaoMedidas> getEvolucoes() { return evolucoes; }
     public void setEvolucoes(List<EvolucaoMedidas> evolucoes) { this.evolucoes = evolucoes; }
