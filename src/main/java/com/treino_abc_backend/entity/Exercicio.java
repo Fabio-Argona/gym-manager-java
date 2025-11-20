@@ -29,11 +29,8 @@ public class Exercicio {
     @Column(nullable = false)
     private int series;
 
-    @Column(name = "rep_min", nullable = false)
-    private int repMin;
-
-    @Column(name = "rep_max", nullable = false)
-    private int repMax;
+    @Column(nullable = false)
+    private int repeticoes;  // Substitui repMin e repMax
 
     @Column(name = "peso_inicial", nullable = false)
     private Double pesoInicial;
@@ -50,7 +47,7 @@ public class Exercicio {
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
 
-    // Getters e Setters
+    // ===================== Getters e Setters =====================
 
     public UUID getId() {
         return id;
@@ -99,20 +96,12 @@ public class Exercicio {
         this.series = series;
     }
 
-    public int getRepMin() {
-        return repMin;
+    public int getRepeticoes() {
+        return repeticoes;
     }
 
-    public void setRepMin(int repMin) {
-        this.repMin = repMin;
-    }
-
-    public int getRepMax() {
-        return repMax;
-    }
-
-    public void setRepMax(int repMax) {
-        this.repMax = repMax;
+    public void setRepeticoes(int repeticoes) {
+        this.repeticoes = repeticoes;
     }
 
     public Double getPesoInicial() {
