@@ -4,6 +4,8 @@ import com.treino_abc_backend.dto.AlunoDTO;
 import com.treino_abc_backend.dto.AlunoHistoricoDTO;
 import com.treino_abc_backend.dto.AlunoRegisterDTO;
 import com.treino_abc_backend.dto.AlunoSenhaDTO;
+import com.treino_abc_backend.dto.AlunoUpdateDTO;
+import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.service.AlunoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -90,4 +93,28 @@ public class AlunoController {
             return ResponseEntity.status(404).body(Map.of("erro", e.getMessage()));
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Aluno> atualizarAluno(
+            @PathVariable UUID id,
+            @RequestBody AlunoUpdateDTO alunoDTO
+    ) {
+        Optional<Aluno> optionalAluno = alunoRepository.findById(id);
+        if (!optionalAluno.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Aluno aluno = optionalAluno.get();
+
+        if (alunoDTO.getNome() != null) aluno.setNome(alunoDTO.getNome());
+        if (alunoDTO.getTelefone() != null) aluno.setTelefone(alunoDTO.getTelefone());
+        if (alunoDTO.getLogin() != null) aluno.setLogin(alunoDTO.getLogin());
+        if (alunoDTO.getPassword() != null) aluno.setPassword(alunoDTO.getPassword());
+        if (alunoDTO.getDataNascimento() != null) aluno.setDataNascimento(alunoDTO.getDataNascimento());
+
+        alunoRepository.save(aluno);
+
+        return ResponseEntity.ok(aluno);
+    }
+
 }
