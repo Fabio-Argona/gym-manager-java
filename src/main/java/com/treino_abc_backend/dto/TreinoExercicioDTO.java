@@ -18,7 +18,6 @@ public class TreinoExercicioDTO {
 
     private int series;
 
-    // Ajustado: agora usa "repeticoes" igual ao service
     private int repeticoes;
 
     @JsonProperty("peso_inicial")

@@ -2,6 +2,7 @@ package com.treino_abc_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.treino_abc_backend.enums.StatusExecucaoExercicio;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,9 @@ public class Exercicio {
     @JoinColumn(name = "grupo_id")
     private TreinoGrupo grupo;
 
+    @Column(name = "aluno_id", nullable = false)
+    private UUID alunoId;
+
     @Column(name = "grupo_muscular", nullable = false)
     private String grupoMuscular;
 
@@ -30,7 +34,7 @@ public class Exercicio {
     private int series;
 
     @Column(nullable = false)
-    private int repeticoes;  // Substitui repMin e repMax
+    private int repeticoes;
 
     @Column(name = "peso_inicial", nullable = false)
     private Double pesoInicial;
@@ -38,16 +42,18 @@ public class Exercicio {
     @Column(length = 500)
     private String observacao;
 
-    @Column(name = "aluno_id", nullable = false)
-    private UUID alunoId;
-
     @Column(name = "ativo", nullable = false)
     private boolean ativo = true;
 
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
 
-    // ===================== Getters e Setters =====================
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusExecucaoExercicio status = StatusExecucaoExercicio.AGENDADO;
+
+    private LocalDateTime inicio;
+    private LocalDateTime fim;
 
     public UUID getId() {
         return id;
@@ -78,6 +84,14 @@ public class Exercicio {
     @JsonProperty("grupoId")
     public UUID getGrupoId() {
         return grupo != null ? grupo.getId() : null;
+    }
+
+    public UUID getAlunoId() {
+        return alunoId;
+    }
+
+    public void setAlunoId(UUID alunoId) {
+        this.alunoId = alunoId;
     }
 
     public String getGrupoMuscular() {
@@ -120,14 +134,6 @@ public class Exercicio {
         this.observacao = observacao;
     }
 
-    public UUID getAlunoId() {
-        return alunoId;
-    }
-
-    public void setAlunoId(UUID alunoId) {
-        this.alunoId = alunoId;
-    }
-
     public boolean isAtivo() {
         return ativo;
     }
@@ -142,5 +148,29 @@ public class Exercicio {
 
     public void setDataCriacao(LocalDateTime dataCriacao) {
         this.dataCriacao = dataCriacao;
+    }
+
+    public StatusExecucaoExercicio getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusExecucaoExercicio status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getInicio() {
+        return inicio;
+    }
+
+    public void setInicio(LocalDateTime inicio) {
+        this.inicio = inicio;
+    }
+
+    public LocalDateTime getFim() {
+        return fim;
+    }
+
+    public void setFim(LocalDateTime fim) {
+        this.fim = fim;
     }
 }

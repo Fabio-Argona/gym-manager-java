@@ -3,9 +3,11 @@ package com.treino_abc_backend.service;
 import com.treino_abc_backend.dto.ExercicioDTO;
 import com.treino_abc_backend.dto.ExercicioEdicaoDTO;
 import com.treino_abc_backend.entity.Exercicio;
+import com.treino_abc_backend.enums.StatusExecucaoExercicio;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -63,24 +65,40 @@ public class ExercicioService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode alterar exercícios de outro aluno");
         }
 
-        existente.setNome(dto.getNome());
-        existente.setGrupoMuscular(dto.getGrupoMuscular());
+        // Atualiza apenas os campos que vieram preenchidos
+        if (dto.getNome() != null) {
+            existente.setNome(dto.getNome());
+        }
+
+        if (dto.getGrupoMuscular() != null) {
+            existente.setGrupoMuscular(dto.getGrupoMuscular());
+        }
+
         existente.setSeries(dto.getSeries());
         existente.setRepeticoes(dto.getRepeticoes());
-        existente.setPesoInicial(dto.getPesoInicial());
-        existente.setObservacao(dto.getObservacao());
+
+        // Ajuste do peso inicial: só atualiza se não for null
+        if (dto.getPesoInicial() != null) {
+            existente.setPesoInicial(dto.getPesoInicial());
+        }
+
+        if (dto.getObservacao() != null) {
+            existente.setObservacao(dto.getObservacao());
+        }
+
         existente.setAtivo(dto.isAtivo());
 
+        // Ajuste do grupo: só altera se vier um novo grupoId
         if (dto.getGrupoId() != null) {
             TreinoGrupo grupo = grupoRepository.findById(dto.getGrupoId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
             existente.setGrupo(grupo);
-        } else {
-            existente.setGrupo(null);
         }
+        // Se vier null, mantém o grupo atual (não sobrescreve com null)
 
         return repository.save(existente);
     }
+
 
     public void deletar(UUID id, UUID alunoId) {
         Exercicio e = repository.findById(id)
@@ -122,6 +140,10 @@ public class ExercicioService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercício deve ter um aluno associado");
         }
 
+        if (e.getGrupoMuscular() == null || e.getGrupoMuscular().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "grupo_muscular é obrigatório");
+        }
+
         if (e.getGrupoId() != null) {
             TreinoGrupo grupo = grupoRepository.findById(e.getGrupoId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grupo não encontrado"));
@@ -132,17 +154,33 @@ public class ExercicioService {
         return repository.save(e);
     }
 
+
     public void removerDoTreino(String id, UUID alunoId) {
         deletar(UUID.fromString(id), alunoId);
     }
 
-    public Optional<Exercicio> atualizarStatus(UUID id, boolean ativo) {
+    public Exercicio atualizarStatus(UUID id, StatusExecucaoExercicio status) {
+        Exercicio exercicio = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Exercício não encontrado"));
+
+        exercicio.setStatus(status);
+
+        if (status == StatusExecucaoExercicio.EM_EXECUCAO) {
+            exercicio.setInicio(LocalDateTime.now());
+        } else if (status == StatusExecucaoExercicio.REALIZADO) {
+            exercicio.setFim(LocalDateTime.now());
+        }
+
+        return repository.save(exercicio);
+    }
+
+
+    public Exercicio atualizarStatusExecucao(UUID id, StatusExecucaoExercicio novoStatus) {
         Exercicio e = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
 
-        e.setAtivo(ativo);
-        if (!ativo) e.setGrupo(null);
-
-        return Optional.of(repository.save(e));
+        e.setStatus(novoStatus);
+        return repository.save(e);
     }
+
 }

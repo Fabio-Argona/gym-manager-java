@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:18
     container_name: treino-abc-postgres
     environment:
       POSTGRES_DB: treino_abc
@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/
+      - pgdata:/var/lib/postgresql  
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s

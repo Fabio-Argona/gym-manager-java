@@ -2,11 +2,16 @@ package com.treino_abc_backend.service;
 
 import com.treino_abc_backend.dto.*;
 import com.treino_abc_backend.entity.*;
+import com.treino_abc_backend.enums.StatusTreino;
+import com.treino_abc_backend.enums.StatusExecucaoExercicio;
 import com.treino_abc_backend.repository.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class TreinoService {
@@ -15,17 +20,20 @@ public class TreinoService {
     private final AlunoRepository alunoRepo;
     private final ExercicioRepository exercicioRepo;
     private final TreinoGrupoRepository grupoRepo;
+    private final TreinoRepository repository;
 
     public TreinoService(
             TreinoExercicioAlunoRepository treinoRepo,
             AlunoRepository alunoRepo,
             ExercicioRepository exercicioRepo,
-            TreinoGrupoRepository grupoRepo
+            TreinoGrupoRepository grupoRepo,
+            TreinoRepository repository
     ) {
         this.treinoRepo = treinoRepo;
         this.alunoRepo = alunoRepo;
         this.exercicioRepo = exercicioRepo;
         this.grupoRepo = grupoRepo;
+        this.repository = repository;
     }
 
     // ---------------------------------------------------------------
@@ -33,13 +41,14 @@ public class TreinoService {
     // ---------------------------------------------------------------
     public List<TreinoGrupoDTO> listarGruposComExercicios(UUID alunoId) {
 
-        List<TreinoExercicioAluno> lista = treinoRepo.findByAlunoId(alunoId);
+        List<TreinoExercicioAluno> lista =
+                treinoRepo.findByGrupo_Aluno_Id(alunoId);
+
         Map<UUID, TreinoGrupoDTO> grupos = new LinkedHashMap<>();
 
         for (TreinoExercicioAluno t : lista) {
 
-            if (t.getGrupo() == null || t.getExercicio() == null)
-                continue;
+            if (t.getGrupo() == null || t.getExercicio() == null) continue;
 
             UUID grupoId = t.getGrupo().getId();
 
@@ -65,6 +74,7 @@ public class TreinoService {
 
         return new ArrayList<>(grupos.values());
     }
+
 
     // ---------------------------------------------------------------
     // ADICIONAR TREINO
@@ -119,7 +129,6 @@ public class TreinoService {
     // ATUALIZAR VIA DTO
     // ---------------------------------------------------------------
     public TreinoExercicioAluno atualizarViaDTO(UUID id, TreinoDTO dto) {
-
         TreinoExercicioAluno treino = treinoRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Treino não encontrado"));
 
@@ -161,7 +170,6 @@ public class TreinoService {
     // FICHA DO ALUNO AGRUPADA POR DIA
     // ---------------------------------------------------------------
     public Map<String, List<FichaTreinoDTO>> fichaPorAluno(UUID alunoId) {
-
         List<TreinoExercicioAluno> treinos = treinoRepo.findByAlunoId(alunoId);
 
         return treinos.stream().collect(Collectors.groupingBy(
@@ -181,15 +189,12 @@ public class TreinoService {
     // EXCLUIR GRUPO SEM APAGAR EXERCÍCIOS
     // ---------------------------------------------------------------
     public void excluirGrupoComExercicios(UUID grupoId) {
-
-        // 1. Remover vínculo dos treinos
         List<TreinoExercicioAluno> treinamentos = treinoRepo.findByGrupo_Id(grupoId);
         for (TreinoExercicioAluno t : treinamentos) {
             t.setGrupo(null);
         }
         treinoRepo.saveAll(treinamentos);
 
-        // 2. Desativar exercícios do grupo
         List<Exercicio> exercicios = exercicioRepo.findByGrupo_Id(grupoId);
         for (Exercicio e : exercicios) {
             e.setAtivo(false);
@@ -197,11 +202,68 @@ public class TreinoService {
         }
         exercicioRepo.saveAll(exercicios);
 
-        // 3. Excluir grupo
         if (!grupoRepo.existsById(grupoId)) {
             throw new IllegalArgumentException("Grupo não encontrado");
         }
 
         grupoRepo.deleteById(grupoId);
+    }
+
+    // ---------------------------------------------------------------
+    // ATUALIZAR STATUS DO TREINO MANUALMENTE
+    // ---------------------------------------------------------------
+    public Treino atualizarStatus(UUID treinoId, StatusTreino novoStatus, UUID alunoId) {
+        Treino treino = repository.findById(treinoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Treino não encontrado"));
+
+        if (!treino.getAlunoId().equals(alunoId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode alterar treino de outro aluno");
+        }
+
+        treino.setStatus(novoStatus);
+        return repository.save(treino);
+    }
+
+    // ---------------------------------------------------------------
+    // CALCULAR STATUS DO TREINO AUTOMATICAMENTE
+    // ---------------------------------------------------------------
+    public StatusTreino calcularStatusTreino(UUID grupoId) {
+
+        List<TreinoExercicioAluno> exercicios =
+                treinoRepo.findByGrupo_Id(grupoId);
+
+        if (exercicios.isEmpty()) {
+            return StatusTreino.AGENDADO;
+        }
+
+        boolean todosRealizados = exercicios.stream()
+                .allMatch(e -> e.getStatus() == StatusExecucaoExercicio.REALIZADO);
+
+        boolean algumExecutado = exercicios.stream()
+                .anyMatch(e ->
+                        e.getStatus() == StatusExecucaoExercicio.EM_EXECUCAO
+                                || e.getStatus() == StatusExecucaoExercicio.REALIZADO);
+
+        if (todosRealizados) {
+            return StatusTreino.REALIZADO;
+        } else if (algumExecutado) {
+            return StatusTreino.EXECUCAO_PARCIAL;
+        } else {
+            return StatusTreino.AGENDADO;
+        }
+    }
+
+
+
+    // ---------------------------------------------------------------
+    // ATUALIZAR STATUS AUTOMATICAMENTE COM BASE NOS EXERCÍCIOS
+    // ---------------------------------------------------------------
+    public Treino atualizarStatusAutomatico(UUID treinoId) {
+        Treino treino = repository.findById(treinoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Treino não encontrado"));
+
+        StatusTreino novoStatus = calcularStatusTreino(treinoId);
+        treino.setStatus(novoStatus);
+        return repository.save(treino);
     }
 }

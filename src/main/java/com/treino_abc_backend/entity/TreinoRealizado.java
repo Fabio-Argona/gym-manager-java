@@ -13,7 +13,7 @@ public class TreinoRealizado {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "treino_aluno_id", nullable = false)
     private TreinoExercicioAluno treino;
 

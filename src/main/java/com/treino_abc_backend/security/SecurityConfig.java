@@ -60,14 +60,21 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/alunos/login",
                                 "/v3/api-docs/**",
+                                "/auth/recuperar-senha",
+                                "/auth/resetar-senha",
                                 "/swagger-ui/**",
                                 "/exercicios/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
+                                "/swagger-ui.html",
+                                "/*/status"
+
+
+                ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/grupos/**").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/exercicios/*/status").permitAll()
+
                         .anyRequest().authenticated()
                 )
 

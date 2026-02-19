@@ -31,6 +31,15 @@ public class AlunoController {
         return ResponseEntity.ok(alunoService.listarTodos());
     }
 
+    @PutMapping("/{id}/registro")
+    public ResponseEntity<?> atualizar(@PathVariable UUID id, @RequestBody AlunoRegisterDTO dto) {
+        try {
+            return ResponseEntity.ok(alunoService.atualizar(id, dto));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable UUID id) {
         try {
@@ -51,14 +60,6 @@ public class AlunoController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable UUID id, @RequestBody AlunoRegisterDTO dto) {
-        try {
-            return ResponseEntity.ok(alunoService.atualizar(id, dto));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
-        }
-    }
 
     @PutMapping("/{id}/senha")
     public ResponseEntity<?> atualizarSenha(@PathVariable UUID id, @RequestBody AlunoSenhaDTO dto) {
