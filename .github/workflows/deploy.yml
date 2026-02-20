@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/modernizacao
 
 jobs:
   deploy:
@@ -23,22 +24,24 @@ jobs:
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "."
           target: "~/app/gym-manager-java"
+          timeout: 60s
+          command_timeout: 10m
 
       - name: Rodar docker-compose na EC2 com limpeza
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/app/gym-manager-java
             echo "🧹 Limpando Docker antigo..."
-            docker-compose down --volumes --remove-orphans
+            docker compose down --volumes --remove-orphans
             docker system prune -af
             docker volume prune -f
             echo "🚀 Subindo containers atualizados..."
-            docker-compose up -d --build
+            docker compose up -d --build
