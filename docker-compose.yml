@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:18
     container_name: treino-abc-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: treino_abc
       POSTGRES_USER: postgres
@@ -21,6 +22,7 @@ services:
   backend:
     build: .
     container_name: treino-backend
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
