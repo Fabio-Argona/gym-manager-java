@@ -24,8 +24,40 @@ public class TreinoRealizadoService {
     }
 
     /**
-     * Registrar que o treino foi feito em determinada data
-     * Ativa um treino criando uma sessão de treino (TreinoRealizado) para aquele dia
+     * Registrar sessão de treino a partir do ID do grupo.
+     * O frontend envia o grupoId (TreinoGrupo.id). Buscamos o primeiro
+     * TreinoExercicioAluno desse grupo para criar o vínculo.
+     */
+    public TreinoRealizado registrarPorGrupo(UUID grupoId, LocalDate data) {
+        List<TreinoExercicioAluno> exerciciosDoGrupo = treinoRepo.findByGrupo_Id(grupoId);
+        if (exerciciosDoGrupo.isEmpty()) {
+            throw new IllegalArgumentException("Treino não encontrado para o grupo informado");
+        }
+        TreinoExercicioAluno treino = exerciciosDoGrupo.get(0);
+        UUID alunoId = treino.getAlunoId();
+
+        // Verificar se já existe uma sessão para este grupo nesta data
+        Optional<TreinoRealizado> existente = realizadoRepo.findByTreinoAlunoId(alunoId)
+                .stream()
+                .filter(tr -> tr.getTreino().getGrupo() != null
+                        && tr.getTreino().getGrupo().getId().equals(grupoId)
+                        && tr.getData().equals(data))
+                .findFirst();
+
+        if (existente.isPresent()) {
+            return existente.get();
+        }
+
+        TreinoRealizado realizado = new TreinoRealizado();
+        realizado.setTreino(treino);
+        realizado.setData(data);
+
+        return realizadoRepo.save(realizado);
+    }
+
+    /**
+     * Registrar que o treino foi feito em determinada data (por TreinoExercicioAluno ID).
+     * Mantido para compatibilidade com chamadas internas.
      */
     public TreinoRealizado registrar(UUID treinoId, LocalDate data) {
         TreinoExercicioAluno treino = treinoRepo.findById(treinoId)

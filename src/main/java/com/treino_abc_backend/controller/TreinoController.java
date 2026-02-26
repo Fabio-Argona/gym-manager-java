@@ -177,15 +177,25 @@ public class TreinoController {
     }
 
     // ---------------------------------------------------------------
-    // REGISTRAR TREINO REALIZADO
+    // REGISTRAR TREINO REALIZADO (aceita grupoId enviado pelo app)
     // ---------------------------------------------------------------
-    @PostMapping("/realizado/{treinoId}")
+    @PostMapping("/realizado/{grupoId}")
     public ResponseEntity<?> registrarTreino(
-            @PathVariable UUID treinoId,
+            @PathVariable UUID grupoId,
             @RequestParam(required = false) String data // yyyy-MM-dd
     ) {
-        LocalDate dia = data != null ? LocalDate.parse(data) : LocalDate.now();
-        return ResponseEntity.ok(realizadoService.registrar(treinoId, dia));
+        try {
+            LocalDate dia = data != null ? LocalDate.parse(data) : LocalDate.now();
+            return ResponseEntity.ok(realizadoService.registrarPorGrupo(grupoId, dia));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    java.util.Map.of(
+                            "error", "Bad Request",
+                            "message", e.getMessage(),
+                            "status", 400
+                    )
+            );
+        }
     }
 
     // ---------------------------------------------------------------
