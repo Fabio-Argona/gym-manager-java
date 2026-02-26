@@ -20,7 +20,13 @@ jobs:
           script: |
             # Instala dependências se necessário
             which git || sudo dnf install -y git
-            sudo dnf install -y docker-buildx-plugin 2>/dev/null || true
+
+            # Atualiza buildx se necessário
+            if ! docker buildx version 2>/dev/null | grep -q "v0\.\(1[7-9]\|[2-9][0-9]\)"; then
+              sudo mkdir -p /usr/libexec/docker/cli-plugins
+              sudo curl -SL https://github.com/docker/buildx/releases/download/v0.19.3/buildx-v0.19.3.linux-amd64 -o /usr/libexec/docker/cli-plugins/docker-buildx
+              sudo chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
+            fi
 
             # Clona ou atualiza o repositório
             if [ -d ~/gym-manager/.git ]; then
