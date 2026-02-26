@@ -18,24 +18,28 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Instala git se não tiver
+            # Instala dependências se necessário
             which git || sudo dnf install -y git
+            sudo dnf install -y docker-buildx-plugin 2>/dev/null || true
 
             # Clona ou atualiza o repositório
             if [ -d ~/gym-manager/.git ]; then
               cd ~/gym-manager
               git pull origin main
             else
+              rm -rf ~/gym-manager
               git clone https://github.com/Fabio-Argona/gym-manager-java.git ~/gym-manager
               cd ~/gym-manager
             fi
+
+            cd ~/gym-manager
 
             # Cria o .env com os secrets
             cat > .env <<EOF
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
 
-            # Sobe os containers (build feito no próprio docker compose)
+            # Sobe os containers
             docker compose down
             docker compose up --build -d
             docker image prune -f
