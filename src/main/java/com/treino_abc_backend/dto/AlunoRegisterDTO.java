@@ -1,5 +1,6 @@
 package com.treino_abc_backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +16,8 @@ public class AlunoRegisterDTO {
 
     private String telefone;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonAlias({"dataNascimento", "data_nascimento"})
     @JsonProperty("data_nascimento")
     private LocalDate dataNascimento;
 
