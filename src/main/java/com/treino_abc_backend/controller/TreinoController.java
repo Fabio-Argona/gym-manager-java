@@ -186,7 +186,13 @@ public class TreinoController {
     ) {
         try {
             LocalDate dia = data != null ? LocalDate.parse(data) : LocalDate.now();
-            return ResponseEntity.ok(realizadoService.registrarPorGrupo(grupoId, dia));
+            var realizado = realizadoService.registrarPorGrupo(grupoId, dia);
+            return ResponseEntity.ok(java.util.Map.of(
+                    "id", realizado.getId().toString(),
+                    "grupoId", realizado.getGrupo().getId().toString(),
+                    "alunoId", realizado.getAlunoId().toString(),
+                    "data", realizado.getData().toString()
+            ));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(
                     java.util.Map.of(

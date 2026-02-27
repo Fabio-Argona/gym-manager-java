@@ -1,5 +1,6 @@
 package com.treino_abc_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "alunos")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Aluno {
 
     @Id

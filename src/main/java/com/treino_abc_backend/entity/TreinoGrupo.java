@@ -1,10 +1,12 @@
 package com.treino_abc_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
 @Table(name = "treino_grupo")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class TreinoGrupo {
 
     @Id
