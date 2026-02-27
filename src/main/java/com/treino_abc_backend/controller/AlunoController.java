@@ -85,6 +85,15 @@ public class AlunoController {
         }
     }
 
+    @PutMapping("/{id}/fisico")
+    public ResponseEntity<?> atualizarFisico(@PathVariable UUID id, @RequestBody Map<String, Object> body) {
+        try {
+            return ResponseEntity.ok(alunoService.atualizarFisico(id, body));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("erro", e.getMessage()));
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable UUID id) {
         try {

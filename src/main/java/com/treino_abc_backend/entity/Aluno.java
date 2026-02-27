@@ -26,6 +26,16 @@ public class Aluno {
     private String password;
     private String role;
 
+    // Dados físicos
+    private String sexo;
+    private Double pesoAtual;
+    private Double altura;
+    private Double percentualGordura;
+    private Double percentualMusculo;
+    private Double imc;
+    private String objetivo;
+    private String nivelTreinamento;
+
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EvolucaoMedidas> evolucoes = new ArrayList<>();
 
@@ -59,4 +69,28 @@ public class Aluno {
 
     public List<EvolucaoMedidas> getEvolucoes() { return evolucoes; }
     public void setEvolucoes(List<EvolucaoMedidas> evolucoes) { this.evolucoes = evolucoes; }
+
+    public String getSexo() { return sexo; }
+    public void setSexo(String sexo) { this.sexo = sexo; }
+
+    public Double getPesoAtual() { return pesoAtual; }
+    public void setPesoAtual(Double pesoAtual) { this.pesoAtual = pesoAtual; }
+
+    public Double getAltura() { return altura; }
+    public void setAltura(Double altura) { this.altura = altura; }
+
+    public Double getPercentualGordura() { return percentualGordura; }
+    public void setPercentualGordura(Double percentualGordura) { this.percentualGordura = percentualGordura; }
+
+    public Double getPercentualMusculo() { return percentualMusculo; }
+    public void setPercentualMusculo(Double percentualMusculo) { this.percentualMusculo = percentualMusculo; }
+
+    public Double getImc() { return imc; }
+    public void setImc(Double imc) { this.imc = imc; }
+
+    public String getObjetivo() { return objetivo; }
+    public void setObjetivo(String objetivo) { this.objetivo = objetivo; }
+
+    public String getNivelTreinamento() { return nivelTreinamento; }
+    public void setNivelTreinamento(String nivelTreinamento) { this.nivelTreinamento = nivelTreinamento; }
 }

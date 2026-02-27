@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -120,6 +121,42 @@ public class AlunoService {
         dto.setTelefone(aluno.getTelefone());
         dto.setDataNascimento(aluno.getDataNascimento());
         dto.setLogin(aluno.getLogin());
+        dto.setSexo(aluno.getSexo());
+        dto.setPesoAtual(aluno.getPesoAtual());
+        dto.setAltura(aluno.getAltura());
+        dto.setPercentualGordura(aluno.getPercentualGordura());
+        dto.setPercentualMusculo(aluno.getPercentualMusculo());
+        dto.setImc(aluno.getImc());
+        dto.setObjetivo(aluno.getObjetivo());
+        dto.setNivelTreinamento(aluno.getNivelTreinamento());
         return dto;
+    }
+
+    public AlunoDTO atualizarFisico(UUID id, Map<String, Object> body) {
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        if (body.containsKey("sexo")) aluno.setSexo((String) body.get("sexo"));
+        if (body.containsKey("pesoAtual")) aluno.setPesoAtual(toDouble(body.get("pesoAtual")));
+        if (body.containsKey("altura")) aluno.setAltura(toDouble(body.get("altura")));
+        if (body.containsKey("percentualGordura")) aluno.setPercentualGordura(toDouble(body.get("percentualGordura")));
+        if (body.containsKey("percentualMusculo")) aluno.setPercentualMusculo(toDouble(body.get("percentualMusculo")));
+
+        // IMC calculado pelo backend: peso / altura²
+        Double peso = aluno.getPesoAtual();
+        Double alt = aluno.getAltura();
+        if (peso != null && alt != null && alt > 0) {
+            double imc = peso / (alt * alt);
+            aluno.setImc(Math.round(imc * 100.0) / 100.0);
+        }
+
+        alunoRepository.save(aluno);
+        return toDTO(aluno);
+    }
+
+    private Double toDouble(Object val) {
+        if (val == null) return null;
+        if (val instanceof Number) return ((Number) val).doubleValue();
+        try { return Double.parseDouble(val.toString()); } catch (Exception e) { return null; }
     }
 }
