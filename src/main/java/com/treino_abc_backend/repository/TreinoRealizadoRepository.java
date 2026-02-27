@@ -12,6 +12,6 @@ public interface TreinoRealizadoRepository extends JpaRepository<TreinoRealizado
     /**
      * Busca todas as sessões de treino de um aluno
      */
-    @Query("SELECT tr FROM TreinoRealizado tr WHERE tr.treino.alunoId = :alunoId ORDER BY tr.data DESC")
+    @Query("SELECT tr FROM TreinoRealizado tr WHERE tr.alunoId = :alunoId ORDER BY tr.data DESC")
     List<TreinoRealizado> findByTreinoAlunoId(@Param("alunoId") UUID alunoId);
 }
