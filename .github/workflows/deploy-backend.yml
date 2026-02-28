@@ -40,9 +40,11 @@ jobs:
 
             cd ~/gym-manager
 
-            # Cria o .env com os secrets
+            # Cria o .env completo com todos os secrets necessários
             cat > .env <<EOF
             JWT_SECRET=${{ secrets.JWT_SECRET }}
+            APP_BASE_URL=${{ secrets.APP_BASE_URL }}
+            DDL_AUTO=update
             EOF
 
             # Sobe os containers
