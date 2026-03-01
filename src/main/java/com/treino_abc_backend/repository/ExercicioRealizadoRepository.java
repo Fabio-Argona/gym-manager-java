@@ -58,4 +58,12 @@ public interface ExercicioRealizadoRepository extends JpaRepository<ExercicioRea
      * Busca por TreinoRealizado (sessão de treino)
      */
     List<ExercicioRealizado> findByTreinoRealizadoId(UUID treinoRealizadoId);
+
+    /**
+     * Busca todos os exercícios realizados de um aluno (sem filtro de data)
+     */
+    @Query("SELECT er FROM ExercicioRealizado er " +
+           "WHERE er.treinoRealizado.alunoId = :alunoId " +
+           "ORDER BY er.dataSessao DESC, er.criadoEm DESC")
+    List<ExercicioRealizado> findByAlunoId(@Param("alunoId") UUID alunoId);
 }

@@ -2,18 +2,13 @@ package com.treino_abc_backend.controller;
 
 import com.treino_abc_backend.dto.ExercicioDTO;
 import com.treino_abc_backend.dto.ExercicioEdicaoDTO;
-import com.treino_abc_backend.dto.StatusUpdateDTO;
 import com.treino_abc_backend.entity.Exercicio;
-import com.treino_abc_backend.enums.StatusExecucaoExercicio;
 import com.treino_abc_backend.service.ExercicioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
-import static com.treino_abc_backend.controller.TreinoController.getExercicioResponseEntity;
 
 @RestController
 @RequestMapping("/exercicios")
@@ -48,7 +43,7 @@ public class ExercicioController {
     // ATUALIZAR EXERCÍCIO EXISTENTE
     // ---------------------------------------------------------------
     @PutMapping("/{id}")
-    public ResponseEntity<ExercicioDTO> atualizar(@PathVariable UUID id,
+    public ResponseEntity<ExercicioDTO> atualizar(@PathVariable("id") UUID id,
                                                   @RequestBody ExercicioEdicaoDTO dto,
                                                   @RequestHeader("aluno-id") String alunoId) {
         Exercicio atualizado = service.atualizar(id, dto, UUID.fromString(alunoId));
@@ -60,19 +55,9 @@ public class ExercicioController {
     // ---------------------------------------------------------------
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@RequestHeader("aluno-id") String alunoId,
-                                        @PathVariable UUID id) {
+                                        @PathVariable("id") UUID id) {
         service.deletar(id, UUID.fromString(alunoId));
         return ResponseEntity.noContent().build();
     }
-
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Exercicio> atualizarStatus(
-            @PathVariable UUID id,
-            @RequestBody StatusUpdateDTO dto
-    ) {
-        Exercicio atualizado = service.atualizarStatus(id, dto.getStatus());
-        return ResponseEntity.ok(atualizado);
-    }
-
 
 }

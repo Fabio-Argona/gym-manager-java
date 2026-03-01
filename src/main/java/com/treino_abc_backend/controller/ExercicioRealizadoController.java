@@ -24,7 +24,6 @@ public class ExercicioRealizadoController {
     /**
      * Registra um exercício realizado pelo aluno
      * POST /exercicios-realizados
-     * Body: RegistrarExercicioDTO
      */
     @PostMapping
     public ResponseEntity<ExercicioRealizadoDTO> registrarExercicio(@RequestBody RegistrarExercicioDTO dto) {
@@ -37,127 +36,33 @@ public class ExercicioRealizadoController {
     }
 
     /**
-     * Busca exercícios realizados por aluno em uma data específica
-     * GET /exercicios-realizados?aluno-id=UUID&data=yyyy-MM-dd
-     */
-    @GetMapping
-    public ResponseEntity<List<ExercicioRealizadoDTO>> buscarPorData(
-            @RequestParam("aluno-id") UUID alunoId,
-            @RequestParam("data") String dataStr
-    ) {
-        try {
-            LocalDate data = LocalDate.parse(dataStr);
-            List<ExercicioRealizadoDTO> resultado = exercicioRealizadoService.buscarPorData(alunoId, data);
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    /**
-     * Busca exercícios em um período (para gráficos)
-     * GET /exercicios-realizados/periodo?aluno-id=UUID&data-inicio=yyyy-MM-dd&data-fim=yyyy-MM-dd
-     */
-    @GetMapping("/periodo")
-    public ResponseEntity<List<ExercicioRealizadoDTO>> buscarPorPeriodo(
-            @RequestParam("aluno-id") UUID alunoId,
-            @RequestParam("data-inicio") String dataInicioStr,
-            @RequestParam("data-fim") String dataFimStr
-    ) {
-        try {
-            LocalDate dataInicio = LocalDate.parse(dataInicioStr);
-            LocalDate dataFim = LocalDate.parse(dataFimStr);
-            List<ExercicioRealizadoDTO> resultado = exercicioRealizadoService.buscarPorPeriodo(alunoId, dataInicio, dataFim);
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    /**
-     * Busca o histórico de progressão de um exercício específico
-     * GET /exercicios-realizados/progressao?aluno-id=UUID&exercicio-id=UUID&data-inicio=yyyy-MM-dd&data-fim=yyyy-MM-dd
+     * Busca histórico de progressão de exercícios do aluno
+     * GET /exercicios-realizados/progressao?alunoId=UUID&exercicioId=UUID(opcional)&dataInicio=yyyy-MM-dd(opcional)&dataFim=yyyy-MM-dd(opcional)
      */
     @GetMapping("/progressao")
     public ResponseEntity<List<ExercicioRealizadoDTO>> buscarProgressao(
-            @RequestParam("aluno-id") UUID alunoId,
-            @RequestParam("exercicio-id") UUID exercicioId,
-            @RequestParam("data-inicio") String dataInicioStr,
-            @RequestParam("data-fim") String dataFimStr
+            @RequestParam("alunoId") UUID alunoId,
+            @RequestParam(required = false) UUID exercicioId,
+            @RequestParam(required = false) String dataInicio,
+            @RequestParam(required = false) String dataFim
     ) {
         try {
-            LocalDate dataInicio = LocalDate.parse(dataInicioStr);
-            LocalDate dataFim = LocalDate.parse(dataFimStr);
-            List<ExercicioRealizadoDTO> resultado = exercicioRealizadoService.buscarProgressaoExercicio(
-                    alunoId, exercicioId, dataInicio, dataFim
-            );
+            List<ExercicioRealizadoDTO> resultado;
+            if (exercicioId != null && dataInicio != null && dataFim != null) {
+                resultado = exercicioRealizadoService.buscarProgressaoExercicio(
+                        alunoId, exercicioId,
+                        LocalDate.parse(dataInicio),
+                        LocalDate.parse(dataFim)
+                );
+            } else if (exercicioId != null) {
+                resultado = exercicioRealizadoService.buscarHistoricoExercicio(alunoId, exercicioId);
+            } else {
+                resultado = exercicioRealizadoService.buscarTodaProgressao(alunoId);
+            }
             return ResponseEntity.ok(resultado);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    /**
-     * Busca histórico completo de um exercício
-     * GET /exercicios-realizados/historico?aluno-id=UUID&exercicio-id=UUID
-     */
-    @GetMapping("/historico")
-    public ResponseEntity<List<ExercicioRealizadoDTO>> buscarHistoricoExercicio(
-            @RequestParam("aluno-id") UUID alunoId,
-            @RequestParam("exercicio-id") UUID exercicioId
-    ) {
-        try {
-            List<ExercicioRealizadoDTO> resultado = exercicioRealizadoService.buscarHistoricoExercicio(alunoId, exercicioId);
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    /**
-     * Busca exercícios de uma sessão de treino
-     * GET /exercicios-realizados/sessao/{treino-realizado-id}
-     */
-    @GetMapping("/sessao/{treinoRealizadoId}")
-    public ResponseEntity<List<ExercicioRealizadoDTO>> buscarPorSessao(
-            @PathVariable UUID treinoRealizadoId
-    ) {
-        try {
-            List<ExercicioRealizadoDTO> resultado = exercicioRealizadoService.buscarPorSessao(treinoRealizadoId);
-            return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    /**
-     * Atualiza um exercício realizado
-     * PUT /exercicios-realizados/{id}
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<ExercicioRealizadoDTO> atualizarExercicio(
-            @PathVariable UUID id,
-            @RequestBody RegistrarExercicioDTO dto
-    ) {
-        try {
-            ExercicioRealizadoDTO resultado = exercicioRealizadoService.atualizar(id, dto);
-            return ResponseEntity.ok(resultado);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    /**
-     * Deleta um exercício realizado
-     * DELETE /exercicios-realizados/{id}
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarExercicio(@PathVariable UUID id) {
-        try {
-            exercicioRealizadoService.deletar(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }
+

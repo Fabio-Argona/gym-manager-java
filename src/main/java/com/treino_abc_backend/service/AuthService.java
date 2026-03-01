@@ -12,14 +12,13 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final AlunoRepository alunoRepository;
-    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthService(AlunoRepository alunoRepository, EmailService emailService,
-                       PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(AlunoRepository alunoRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil) {
         this.alunoRepository = alunoRepository;
-        this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
@@ -52,23 +51,19 @@ public class AuthService {
         return new TokenResponseDTO(token, toDTO(aluno));
     }
 
-    public void enviarEmailRecuperacao(String email) {
+    public void redefinirSenha(String email, String cpf6, String novaSenha) {
         String normalizedEmail = email.trim().toLowerCase();
 
         Aluno aluno = alunoRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new RuntimeException("Email não encontrado: " + normalizedEmail));
+                .orElseThrow(() -> new RuntimeException("Email não encontrado."));
 
-        String token = jwtUtil.generateToken(normalizedEmail, aluno.getCpf());
-        String link = "https://seuapp.com/resetar-senha?token=" + token;
+        // Remove formatação do CPF e compara os primeiros 6 dígitos
+        String cpfDigitos = aluno.getCpf().replaceAll("[^0-9]", "");
+        String cpf6Limpo = cpf6.replaceAll("[^0-9]", "");
 
-        emailService.enviar(normalizedEmail, "Recuperação de senha", "Clique aqui para redefinir: " + link);
-    }
-
-    public void redefinirSenha(String token, String novaSenha) {
-        String email = jwtUtil.extractEmail(token).trim().toLowerCase();
-
-        Aluno aluno = alunoRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Token inválido ou email não encontrado: " + email));
+        if (!cpfDigitos.startsWith(cpf6Limpo)) {
+            throw new RuntimeException("CPF incorreto.");
+        }
 
         aluno.setPassword(passwordEncoder.encode(novaSenha));
         alunoRepository.save(aluno);

@@ -1,6 +1,7 @@
 package com.treino_abc_backend.controller;
 
 import com.treino_abc_backend.service.UploadService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -17,16 +18,19 @@ public class UploadController {
 
     private final UploadService uploadService;
 
+    @Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
+
     public UploadController(UploadService uploadService) {
         this.uploadService = uploadService;
     }
 
     // 📤 Upload da imagem do aluno
     @PostMapping("/upload/{id}")
-    public ResponseEntity<String> uploadImagem(@RequestParam("foto") MultipartFile file, @PathVariable String id) {
+    public ResponseEntity<String> uploadImagem(@RequestParam("foto") MultipartFile file, @PathVariable("id") String id) {
         try {
             String nomeArquivo = uploadService.salvarImagem(file, id);
-            String url = "http://18.222.56.92:8080/api/uploads/" + nomeArquivo;
+            String url = baseUrl + "/api/uploads/" + nomeArquivo;
             return ResponseEntity.ok(url);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Erro ao salvar imagem: " + e.getMessage());
@@ -35,7 +39,7 @@ public class UploadController {
 
     // 🖼️ Retorna a imagem para exibição no avatar
     @GetMapping("/uploads/{filename}")
-    public ResponseEntity<Resource> getImagem(@PathVariable String filename) {
+    public ResponseEntity<Resource> getImagem(@PathVariable("filename") String filename) {
         try {
             Path caminho = Paths.get("uploads").resolve(filename);
             Resource imagem = new UrlResource(caminho.toUri());

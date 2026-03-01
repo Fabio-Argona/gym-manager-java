@@ -18,6 +18,7 @@ public class EvolucaoMedidasDTO {
     private Double bracoEsquerdo;
     private Double coxaDireita;
     private Double coxaEsquerda;
+    private Double altura;
     private UUID alunoId;
 
     // Getters e Setters
@@ -59,6 +60,9 @@ public class EvolucaoMedidasDTO {
 
     public Double getCoxaEsquerda() { return coxaEsquerda; }
     public void setCoxaEsquerda(Double coxaEsquerda) { this.coxaEsquerda = coxaEsquerda; }
+
+    public Double getAltura() { return altura; }
+    public void setAltura(Double altura) { this.altura = altura; }
 
     public UUID getAlunoId() { return alunoId; }
     public void setAlunoId(UUID alunoId) { this.alunoId = alunoId; }

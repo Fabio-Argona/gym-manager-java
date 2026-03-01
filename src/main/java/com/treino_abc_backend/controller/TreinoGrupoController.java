@@ -25,19 +25,19 @@ public class TreinoGrupoController {
     }
 
     @GetMapping("/aluno/{alunoId}")
-    public ResponseEntity<List<TreinoGrupoDTO>> listarPorAluno(@PathVariable UUID alunoId) {
+    public ResponseEntity<List<TreinoGrupoDTO>> listarPorAluno(@PathVariable("alunoId") UUID alunoId) {
         List<TreinoGrupoDTO> grupos = grupoService.listarPorAluno(alunoId);
         return ResponseEntity.ok(grupos);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> remover(@PathVariable UUID id) {
+    public ResponseEntity<Void> remover(@PathVariable("id") UUID id) {
         grupoService.remover(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TreinoGrupoDTO> editarGrupo(@PathVariable UUID id, @RequestBody TreinoGrupoDTO dto) {
+    public ResponseEntity<TreinoGrupoDTO> editarGrupo(@PathVariable("id") UUID id, @RequestBody TreinoGrupoDTO dto) {
         try {
             TreinoGrupoDTO atualizado = grupoService.editar(id, dto);
             return ResponseEntity.ok(atualizado);
@@ -49,7 +49,7 @@ public class TreinoGrupoController {
     }
 
     @DeleteMapping("/{id}/com-exercicios")
-    public ResponseEntity<?> excluirGrupoComExercicios(@PathVariable UUID id) {
+    public ResponseEntity<?> excluirGrupoComExercicios(@PathVariable("id") UUID id) {
         try {
             grupoService.excluirGrupoComExercicios(id);
             return ResponseEntity.noContent().build();

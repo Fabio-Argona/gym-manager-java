@@ -1,10 +1,13 @@
 package com.treino_abc_backend.controller;
 
-import com.treino_abc_backend.dto.*;
+import com.treino_abc_backend.dto.AlunoDTO;
+import com.treino_abc_backend.dto.AlunoRegisterDTO;
+import com.treino_abc_backend.dto.AlunoLoginDTO;
+import com.treino_abc_backend.dto.RedefinirSenhaDTO;
+import com.treino_abc_backend.dto.TokenResponseDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.security.JwtUtil;
 import com.treino_abc_backend.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,11 +15,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    public AuthController(AuthService authService, JwtUtil jwtUtil) {
+        this.authService = authService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AlunoRegisterDTO dto) {
@@ -58,20 +63,10 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/recuperar-senha")
-    public ResponseEntity<?> recuperarSenha(@RequestBody RecuperarSenhaDTO dto) {
-        try {
-            authService.enviarEmailRecuperacao(dto.getEmail());
-            return ResponseEntity.ok("Email de recuperação enviado");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     @PostMapping("/resetar-senha")
     public ResponseEntity<?> resetarSenha(@RequestBody RedefinirSenhaDTO dto) {
         try {
-            authService.redefinirSenha(dto.getToken(), dto.getNovaSenha());
+            authService.redefinirSenha(dto.getEmail(), dto.getCpf6(), dto.getNovaSenha());
             return ResponseEntity.ok("Senha redefinida com sucesso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

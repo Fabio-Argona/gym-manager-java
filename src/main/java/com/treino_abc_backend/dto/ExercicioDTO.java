@@ -44,15 +44,18 @@ public class ExercicioDTO {
     @JsonProperty("status")
     private StatusTreino status;
 
+    @JsonProperty("treino_exercicio_aluno_id")
+    private UUID treinoExercicioAlunoId;
+
     public ExercicioDTO() {
         this.repeticoes = 0;
         this.ativo = true;
     }
 
     public ExercicioDTO(UUID id, UUID grupoId, String nome, String grupoMuscular,
-                        Integer series, Integer repeticoes, Double pesoInicial,
-                        String observacao, UUID alunoId, boolean ativo,
-                        LocalDateTime dataCriacao, StatusTreino status) {
+            Integer series, Integer repeticoes, Double pesoInicial,
+            String observacao, UUID alunoId, boolean ativo,
+            LocalDateTime dataCriacao, StatusTreino status) {
         this.id = id;
         this.grupoId = grupoId;
         this.nome = nome;
@@ -67,41 +70,109 @@ public class ExercicioDTO {
         this.status = status;
     }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public UUID getId() {
+        return id;
+    }
 
-    public UUID getGrupoId() { return grupoId; }
-    public void setGrupoId(UUID grupoId) { this.grupoId = grupoId; }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public UUID getGrupoId() {
+        return grupoId;
+    }
 
-    public String getGrupoMuscular() { return grupoMuscular; }
-    public void setGrupoMuscular(String grupoMuscular) { this.grupoMuscular = grupoMuscular; }
+    public void setGrupoId(UUID grupoId) {
+        this.grupoId = grupoId;
+    }
 
-    public Integer getSeries() { return series; }
-    public void setSeries(Integer series) { this.series = series; }
+    public String getNome() {
+        return nome;
+    }
 
-    public Integer getRepeticoes() { return repeticoes; }
-    public void setRepeticoes(Integer repeticoes) { this.repeticoes = repeticoes; }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-    public Double getPesoInicial() { return pesoInicial; }
-    public void setPesoInicial(Double pesoInicial) { this.pesoInicial = pesoInicial; }
+    public String getGrupoMuscular() {
+        return grupoMuscular;
+    }
 
-    public String getObservacao() { return observacao; }
-    public void setObservacao(String observacao) { this.observacao = observacao; }
+    public void setGrupoMuscular(String grupoMuscular) {
+        this.grupoMuscular = grupoMuscular;
+    }
 
-    public UUID getAlunoId() { return alunoId; }
-    public void setAlunoId(UUID alunoId) { this.alunoId = alunoId; }
+    public Integer getSeries() {
+        return series;
+    }
 
-    public boolean isAtivo() { return ativo; }
-    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+    public void setSeries(Integer series) {
+        this.series = series;
+    }
 
-    public LocalDateTime getDataCriacao() { return dataCriacao; }
-    public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
+    public Integer getRepeticoes() {
+        return repeticoes;
+    }
 
-    public StatusTreino getStatus() { return status; }
-    public void setStatus(StatusTreino status) { this.status = status; }
+    public void setRepeticoes(Integer repeticoes) {
+        this.repeticoes = repeticoes;
+    }
+
+    public Double getPesoInicial() {
+        return pesoInicial;
+    }
+
+    public void setPesoInicial(Double pesoInicial) {
+        this.pesoInicial = pesoInicial;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
+
+    public UUID getAlunoId() {
+        return alunoId;
+    }
+
+    public void setAlunoId(UUID alunoId) {
+        this.alunoId = alunoId;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
+    public StatusTreino getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusTreino status) {
+        this.status = status;
+    }
+
+    public UUID getTreinoExercicioAlunoId() {
+        return treinoExercicioAlunoId;
+    }
+
+    public void setTreinoExercicioAlunoId(UUID treinoExercicioAlunoId) {
+        this.treinoExercicioAlunoId = treinoExercicioAlunoId;
+    }
 
     @Override
     public String toString() {

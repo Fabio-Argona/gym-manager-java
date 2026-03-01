@@ -3,18 +3,18 @@ package com.treino_abc_backend.service;
 import com.treino_abc_backend.dto.ExercicioDTO;
 import com.treino_abc_backend.dto.ExercicioEdicaoDTO;
 import com.treino_abc_backend.entity.Exercicio;
-import com.treino_abc_backend.enums.StatusExecucaoExercicio;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.ExercicioRepository;
+import com.treino_abc_backend.repository.TreinoExercicioAlunoRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.treino_abc_backend.entity.TreinoExercicioAluno;
+import com.treino_abc_backend.enums.StatusExecucaoExercicio;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,10 +23,13 @@ public class ExercicioService {
 
     private final ExercicioRepository repository;
     private final TreinoGrupoRepository grupoRepository;
+    private final TreinoExercicioAlunoRepository treinoExercicioAlunoRepository;
 
-    public ExercicioService(ExercicioRepository repository, TreinoGrupoRepository grupoRepository) {
+    public ExercicioService(ExercicioRepository repository, TreinoGrupoRepository grupoRepository,
+            TreinoExercicioAlunoRepository treinoExercicioAlunoRepository) {
         this.repository = repository;
         this.grupoRepository = grupoRepository;
+        this.treinoExercicioAlunoRepository = treinoExercicioAlunoRepository;
     }
 
     public List<ExercicioDTO> getPorAluno(UUID alunoId) {
@@ -99,7 +102,6 @@ public class ExercicioService {
         return repository.save(existente);
     }
 
-
     public void deletar(UUID id, UUID alunoId) {
         Exercicio e = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
@@ -132,6 +134,27 @@ public class ExercicioService {
         dto.setAtivo(e.isAtivo());
         dto.setDataCriacao(e.getDataCriacao());
         dto.setGrupoId(e.getGrupoId());
+
+        // Busca ou cria o registro de status para este aluno/exercício
+        TreinoExercicioAluno te = treinoExercicioAlunoRepository
+                .findByExercicio_IdAndAlunoId(e.getId(), e.getAlunoId())
+                .orElseGet(() -> {
+                    TreinoExercicioAluno novoStatus = new TreinoExercicioAluno();
+                    novoStatus.setAlunoId(e.getAlunoId());
+                    novoStatus.setExercicio(e);
+                    novoStatus.setGrupo(e.getGrupo());
+                    novoStatus.setStatus(StatusExecucaoExercicio.AGENDADO);
+                    novoStatus.setDiaSemana("N/A"); // Valor padrão
+                    novoStatus.setOrdem(0); // Valor padrão
+                    novoStatus.setNomeExercicio(e.getNome());
+                    novoStatus.setSeries(e.getSeries());
+                    novoStatus.setRepeticoes(e.getRepeticoes());
+                    novoStatus.setPesoInicial(e.getPesoInicial());
+                    return treinoExercicioAlunoRepository.save(novoStatus);
+                });
+
+        dto.setTreinoExercicioAlunoId(te.getId());
+
         return dto;
     }
 
@@ -153,34 +176,4 @@ public class ExercicioService {
         e.setDataCriacao(LocalDateTime.now());
         return repository.save(e);
     }
-
-
-    public void removerDoTreino(String id, UUID alunoId) {
-        deletar(UUID.fromString(id), alunoId);
-    }
-
-    public Exercicio atualizarStatus(UUID id, StatusExecucaoExercicio status) {
-        Exercicio exercicio = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Exercício não encontrado"));
-
-        exercicio.setStatus(status);
-
-        if (status == StatusExecucaoExercicio.EM_EXECUCAO) {
-            exercicio.setInicio(LocalDateTime.now());
-        } else if (status == StatusExecucaoExercicio.REALIZADO) {
-            exercicio.setFim(LocalDateTime.now());
-        }
-
-        return repository.save(exercicio);
-    }
-
-
-    public Exercicio atualizarStatusExecucao(UUID id, StatusExecucaoExercicio novoStatus) {
-        Exercicio e = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercício não encontrado"));
-
-        e.setStatus(novoStatus);
-        return repository.save(e);
-    }
-
 }

@@ -60,30 +60,6 @@ public class ExercicioRealizadoService {
         return converterParaDTO(salvo, exercicio.getNome());
     }
 
-    /**
-     * Busca todos os exercícios realizados de um aluno em uma data específica
-     */
-    public List<ExercicioRealizadoDTO> buscarPorData(UUID alunoId, LocalDate data) {
-        List<ExercicioRealizado> exercicios = exercicioRealizadoRepo.findByAlunoIdAndData(alunoId, data);
-        return exercicios.stream()
-                .map(er -> converterParaDTO(er, er.getExercicio().getNome()))
-                .toList();
-    }
-
-    /**
-     * Busca todos os exercícios realizados de um aluno em um período (para gráficos)
-     */
-    public List<ExercicioRealizadoDTO> buscarPorPeriodo(UUID alunoId, LocalDate dataInicio, LocalDate dataFim) {
-        List<ExercicioRealizado> exercicios = exercicioRealizadoRepo.findByAlunoIdAndDataRange(alunoId, dataInicio, dataFim);
-        return exercicios.stream()
-                .map(er -> converterParaDTO(er, er.getExercicio().getNome()))
-                .toList();
-    }
-
-    /**
-     * Busca o histórico de um exercício específico (para progressão)
-     * Útil para criar gráficos de evolução de peso/séries/reps
-     */
     public List<ExercicioRealizadoDTO> buscarProgressaoExercicio(UUID alunoId, UUID exercicioId,
                                                                  LocalDate dataInicio, LocalDate dataFim) {
         List<ExercicioRealizado> exercicios = exercicioRealizadoRepo.findProgressao(alunoId, exercicioId, dataInicio, dataFim);
@@ -92,9 +68,6 @@ public class ExercicioRealizadoService {
                 .toList();
     }
 
-    /**
-     * Busca exercícios realizados de um exercício específico (histórico completo)
-     */
     public List<ExercicioRealizadoDTO> buscarHistoricoExercicio(UUID alunoId, UUID exercicioId) {
         List<ExercicioRealizado> exercicios = exercicioRealizadoRepo.findByAlunoIdAndExercicioId(alunoId, exercicioId);
         return exercicios.stream()
@@ -102,42 +75,12 @@ public class ExercicioRealizadoService {
                 .toList();
     }
 
-    /**
-     * Busca exercícios realizados em uma sessão de treino
-     */
-    public List<ExercicioRealizadoDTO> buscarPorSessao(UUID treinoRealizadoId) {
-        List<ExercicioRealizado> exercicios = exercicioRealizadoRepo.findByTreinoRealizadoId(treinoRealizadoId);
-        return exercicios.stream()
+    public List<ExercicioRealizadoDTO> buscarTodaProgressao(UUID alunoId) {
+        return exercicioRealizadoRepo.findByAlunoId(alunoId).stream()
                 .map(er -> converterParaDTO(er, er.getExercicio().getNome()))
                 .toList();
     }
 
-    /**
-     * Atualiza um exercício realizado
-     */
-    public ExercicioRealizadoDTO atualizar(UUID id, RegistrarExercicioDTO dto) {
-        ExercicioRealizado exercicioRealizado = exercicioRealizadoRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Exercício realizado não encontrado"));
-
-        exercicioRealizado.setSeriesRealizadas(dto.getSeries_realizadas());
-        exercicioRealizado.setRepeticoesRealizadas(dto.getRepeticoes_realizadas());
-        exercicioRealizado.setPesoUtilizado(dto.getPeso_utilizado());
-        exercicioRealizado.setObservacoes(dto.getObservacoes());
-
-        ExercicioRealizado atualizado = exercicioRealizadoRepo.save(exercicioRealizado);
-        return converterParaDTO(atualizado, atualizado.getExercicio().getNome());
-    }
-
-    /**
-     * Deleta um exercício realizado
-     */
-    public void deletar(UUID id) {
-        exercicioRealizadoRepo.deleteById(id);
-    }
-
-    /**
-     * Converte ExercicioRealizado para DTO
-     */
     private ExercicioRealizadoDTO converterParaDTO(ExercicioRealizado exercicio, String nomeExercicio) {
         return new ExercicioRealizadoDTO(
                 exercicio.getId(),

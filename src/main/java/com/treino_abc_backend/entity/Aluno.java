@@ -1,5 +1,6 @@
 package com.treino_abc_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -36,6 +37,7 @@ public class Aluno {
     private String objetivo;
     private String nivelTreinamento;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EvolucaoMedidas> evolucoes = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package com.treino_abc_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -26,7 +27,9 @@ public class EvolucaoMedidas {
     private Double bracoEsquerdo;
     private Double coxaDireita;
     private Double coxaEsquerda;
+    private Double altura;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aluno_id")
     private Aluno aluno;
@@ -73,6 +76,9 @@ public class EvolucaoMedidas {
 
     public Double getCoxaEsquerda() { return coxaEsquerda; }
     public void setCoxaEsquerda(Double coxaEsquerda) { this.coxaEsquerda = coxaEsquerda; }
+
+    public Double getAltura() { return altura; }
+    public void setAltura(Double altura) { this.altura = altura; }
 
     public Aluno getAluno() { return aluno; }
     public void setAluno(Aluno aluno) { this.aluno = aluno; }

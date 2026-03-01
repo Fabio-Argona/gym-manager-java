@@ -31,7 +31,7 @@ public class EvolucaoMedidasController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable UUID id, @RequestBody EvolucaoMedidasDTO dto) {
+    public ResponseEntity<?> atualizar(@PathVariable("id") UUID id, @RequestBody EvolucaoMedidasDTO dto) {
         try {
             EvolucaoMedidas atualizado = evolucaoService.atualizar(id, dto);
             return ResponseEntity.ok(atualizado);
@@ -41,20 +41,10 @@ public class EvolucaoMedidasController {
     }
 
     @GetMapping("/aluno/{alunoId}")
-    public ResponseEntity<?> listarPorAluno(@PathVariable UUID alunoId) {
+    public ResponseEntity<?> listarPorAluno(@PathVariable("alunoId") UUID alunoId) {
         try {
             List<EvolucaoMedidas> lista = evolucaoService.listarPorAluno(alunoId);
             return ResponseEntity.ok(lista);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(Map.of("erro", e.getMessage()));
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable UUID id) {
-        try {
-            evolucaoService.deletar(id);
-            return ResponseEntity.ok(Map.of("mensagem", "Evolução deletada com sucesso"));
         } catch (Exception e) {
             return ResponseEntity.status(404).body(Map.of("erro", e.getMessage()));
         }

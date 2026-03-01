@@ -79,6 +79,12 @@
 		</dependency>
 
 
+		<!-- Email (SMTP) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
 		<!-- Devtools -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -163,6 +169,9 @@
 					<source>21</source>
 					<target>21</target>
 					<encoding>UTF-8</encoding>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
             <plugin>

@@ -2,6 +2,7 @@ package com.treino_abc_backend.service;
 
 import com.treino_abc_backend.dto.TreinoGrupoDTO;
 import com.treino_abc_backend.entity.Aluno;
+import com.treino_abc_backend.entity.Exercicio;
 import com.treino_abc_backend.entity.TreinoExercicioAluno;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.AlunoRepository;
@@ -9,9 +10,8 @@ import com.treino_abc_backend.repository.ExercicioRepository;
 import com.treino_abc_backend.repository.TreinoExercicioAlunoRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
 import org.springframework.stereotype.Service;
-import com.treino_abc_backend.entity.Exercicio;
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,7 +25,9 @@ public class TreinoGrupoService {
     private final ExercicioRepository exercicioRepo;
 
 
-    public TreinoGrupoService(TreinoGrupoRepository grupoRepo, AlunoRepository alunoRepo, TreinoExercicioAlunoRepository treinoRepo, TreinoExercicioAlunoRepository treinoAlunoRepo, ExercicioRepository exercicioRepo) {
+    public TreinoGrupoService(TreinoGrupoRepository grupoRepo, AlunoRepository alunoRepo,
+                               TreinoExercicioAlunoRepository treinoAlunoRepo,
+                               ExercicioRepository exercicioRepo) {
         this.grupoRepo = grupoRepo;
         this.alunoRepo = alunoRepo;
         this.treinoAlunoRepo = treinoAlunoRepo;

@@ -77,4 +77,11 @@ public class TreinoRealizadoService {
     public List<TreinoRealizado> buscarSessoesPorAluno(UUID alunoId) {
         return realizadoRepo.findByTreinoAlunoId(alunoId);
     }
+
+    /**
+     * Buscar a sessão mais recente de um grupo específico
+     */
+    public Optional<TreinoRealizado> buscarUltimaPorGrupo(UUID grupoId) {
+        return realizadoRepo.findTopByGrupo_IdOrderByDataDesc(grupoId);
+    }
 }

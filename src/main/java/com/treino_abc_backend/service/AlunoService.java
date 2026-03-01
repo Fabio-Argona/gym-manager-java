@@ -1,17 +1,14 @@
 package com.treino_abc_backend.service;
 
 import com.treino_abc_backend.dto.AlunoDTO;
-import com.treino_abc_backend.dto.AlunoHistoricoDTO;
-import com.treino_abc_backend.dto.AlunoRegisterDTO;
+import com.treino_abc_backend.dto.AlunoUpdateDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.repository.AlunoRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AlunoService {
@@ -24,95 +21,26 @@ public class AlunoService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public AlunoDTO salvar(AlunoRegisterDTO dto) {
-        if (alunoRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Email já cadastrado: " + dto.getEmail());
-        }
-
-        Aluno aluno = new Aluno();
-        aluno.setNome(dto.getNome());
-        aluno.setCpf(dto.getCpf());
-        aluno.setEmail(dto.getEmail());
-        aluno.setTelefone(dto.getTelefone());
-        aluno.setDataNascimento(dto.getDataNascimento());
-        aluno.setLogin(dto.getLogin());
-        aluno.setPassword(passwordEncoder.encode(dto.getPassword()));
-        aluno.setRole("ROLE_USER");
-
-        Aluno saved = alunoRepository.save(aluno);
-        return toDTO(saved);
-    }
-
     public AlunoDTO buscarPorId(UUID id) {
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
         return toDTO(aluno);
     }
 
-    public AlunoHistoricoDTO buscarComHistorico(UUID id) {
-        Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
-
-        AlunoHistoricoDTO dto = new AlunoHistoricoDTO();
-        dto.setId(aluno.getId());
-        dto.setNome(aluno.getNome());
-        dto.setCpf(aluno.getCpf());
-        dto.setEmail(aluno.getEmail());
-        dto.setTelefone(aluno.getTelefone());
-        dto.setDataNascimento(aluno.getDataNascimento());
-        dto.setLogin(aluno.getLogin());
-        dto.setEvolucoes(aluno.getEvolucoes());
-
-        return dto;
-    }
-
-    public List<AlunoDTO> listarTodos() {
-        return alunoRepository.findAll().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    public String deletar(UUID id) {
-        Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado para deletar."));
-        String nome = aluno.getNome();
-        alunoRepository.deleteById(id);
-        return nome;
-    }
-
-    public AlunoDTO atualizar(UUID id, AlunoRegisterDTO dto) {
+    public AlunoDTO atualizarCompleto(UUID id, AlunoUpdateDTO dto) {
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
-        aluno.setNome(dto.getNome());
-        aluno.setCpf(dto.getCpf());
-        aluno.setEmail(dto.getEmail());
-        aluno.setTelefone(dto.getTelefone());
-        aluno.setDataNascimento(dto.getDataNascimento());
-        aluno.setLogin(dto.getLogin());
+        if (dto.getNome() != null) aluno.setNome(dto.getNome());
+        if (dto.getTelefone() != null) aluno.setTelefone(dto.getTelefone());
+        if (dto.getLogin() != null) aluno.setLogin(dto.getLogin());
+        if (dto.getPassword() != null) aluno.setPassword(passwordEncoder.encode(dto.getPassword()));
+        if (dto.getDataNascimento() != null) aluno.setDataNascimento(dto.getDataNascimento());
 
-        alunoRepository.save(aluno);
-
-        return toDTO(aluno);
+        return toDTO(alunoRepository.save(aluno));
     }
 
-    public void atualizarSenha(UUID id, String novaSenha) {
-        Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
-
-        aluno.setPassword(passwordEncoder.encode(novaSenha));
-        alunoRepository.save(aluno);
-    }
-
-    public void atualizarLogin(UUID id, String novoLogin) {
-        Aluno aluno = alunoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
-
-        aluno.setLogin(novoLogin);
-        alunoRepository.save(aluno);
-    }
-
-    private AlunoDTO toDTO(Aluno aluno) {
+    public AlunoDTO toDTO(Aluno aluno) {
         AlunoDTO dto = new AlunoDTO();
         dto.setId(aluno.getId());
         dto.setNome(aluno.getNome());
@@ -136,19 +64,20 @@ public class AlunoService {
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
+        // /fisico agora salva apenas dados estáticos: sexo e altura
         if (body.containsKey("sexo")) aluno.setSexo((String) body.get("sexo"));
-        if (body.containsKey("pesoAtual")) aluno.setPesoAtual(toDouble(body.get("pesoAtual")));
         if (body.containsKey("altura")) aluno.setAltura(toDouble(body.get("altura")));
-        if (body.containsKey("percentualGordura")) aluno.setPercentualGordura(toDouble(body.get("percentualGordura")));
-        if (body.containsKey("percentualMusculo")) aluno.setPercentualMusculo(toDouble(body.get("percentualMusculo")));
 
-        // IMC calculado pelo backend: peso / altura²
-        Double peso = aluno.getPesoAtual();
-        Double alt = aluno.getAltura();
-        if (peso != null && alt != null && alt > 0) {
-            double imc = peso / (alt * alt);
-            aluno.setImc(Math.round(imc * 100.0) / 100.0);
-        }
+        alunoRepository.save(aluno);
+        return toDTO(aluno);
+    }
+
+    public AlunoDTO atualizarObjetivo(UUID id, String objetivo, String nivelTreinamento) {
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        if (objetivo != null) aluno.setObjetivo(objetivo);
+        if (nivelTreinamento != null) aluno.setNivelTreinamento(nivelTreinamento);
 
         alunoRepository.save(aluno);
         return toDTO(aluno);
