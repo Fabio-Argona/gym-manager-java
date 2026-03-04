@@ -27,7 +27,7 @@ public class Aluno {
     private String password;
     private String role;
 
-    // Dados físicos
+    //  Dados   Físicos
     private String sexo;
     private Double pesoAtual;
     private Double altura;
