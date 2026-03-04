@@ -9,6 +9,7 @@ public class ExercicioRealizadoDTO {
     private UUID id;
     private UUID exercicioId;
     private String nomeExercicio;
+    private String grupoMuscular;
     private Integer seriesRealizadas;
     private Integer repeticoesRealizadas;
     private Double pesoUtilizado;
@@ -18,13 +19,14 @@ public class ExercicioRealizadoDTO {
 
     public ExercicioRealizadoDTO() {}
 
-    public ExercicioRealizadoDTO(UUID id, UUID exercicioId, String nomeExercicio,
+    public ExercicioRealizadoDTO(UUID id, UUID exercicioId, String nomeExercicio, String grupoMuscular,
                                 Integer seriesRealizadas, Integer repeticoesRealizadas,
                                 Double pesoUtilizado, String observacoes, LocalDate dataSessao,
                                 LocalDateTime criadoEm) {
         this.id = id;
         this.exercicioId = exercicioId;
         this.nomeExercicio = nomeExercicio;
+        this.grupoMuscular = grupoMuscular;
         this.seriesRealizadas = seriesRealizadas;
         this.repeticoesRealizadas = repeticoesRealizadas;
         this.pesoUtilizado = pesoUtilizado;
@@ -42,6 +44,9 @@ public class ExercicioRealizadoDTO {
 
     public String getNomeExercicio() { return nomeExercicio; }
     public void setNomeExercicio(String nomeExercicio) { this.nomeExercicio = nomeExercicio; }
+
+    public String getGrupoMuscular() { return grupoMuscular; }
+    public void setGrupoMuscular(String grupoMuscular) { this.grupoMuscular = grupoMuscular; }
 
     public Integer getSeriesRealizadas() { return seriesRealizadas; }
     public void setSeriesRealizadas(Integer seriesRealizadas) { this.seriesRealizadas = seriesRealizadas; }
