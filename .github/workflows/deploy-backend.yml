@@ -32,6 +32,7 @@ jobs:
         run: |
           echo "Testando conexão com ${{ secrets.EC2_HOST }} na porta 22..."
           nc -zv -w 10 ${{ secrets.EC2_HOST }} 22 && echo "Porta 22 acessível!" || echo "FALHA: Porta 22 inacessível!"
+          # Usuário correto para Amazon Linux é ec2-user
 
       - name: Copy files to EC2 via SCP
         uses: appleboy/scp-action@v0.1.7
@@ -57,9 +58,9 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
 
-            # Para containers antigos, sobe novamente
+            #  Para containers antigos, sobe novamente
             docker compose down
             docker compose up --build -d
 
-            # Limpa imagens não utilizadas
+            #  Limpa imagens não utilizadas
             docker image prune -f
