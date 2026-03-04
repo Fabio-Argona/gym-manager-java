@@ -43,7 +43,8 @@ jobs:
           command_timeout: 10m
           script: |
             cd /home/ec2-user/gym-manager
-            printf 'JWT_SECRET=%s\nAPP_BASE_URL=%s\nDDL_AUTO=update\n' '${{ secrets.JWT_SECRET }}' '${{ secrets.APP_BASE_URL }}' > .env
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+            echo "APP_BASE_URL=${{ secrets.APP_BASE_URL }}" >> .env
             docker compose down
             docker compose up --build -d
             docker image prune -f
