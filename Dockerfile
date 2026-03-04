@@ -1,13 +1,6 @@
-
-# Etapa 1 : build com Maven
-FROM maven:3.9.4-eclipse-temurin-21 AS builder
+# Imagem de runtime — JAR já compilado pelo GitHub Actions
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
-
-# Etapa 2 :  imagem leve para rodar o app
-FROM eclipse-temurin:21-jdk
-WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
+COPY target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
