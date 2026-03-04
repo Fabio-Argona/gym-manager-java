@@ -1,0 +1,24 @@
+# ===== Java / Maven =====
+gym-manager-java/target/
+gym-manager-java/uploads/
+gym-manager-java/.env
+*.pem
+*.jar.original
+
+# ===== Flutter =====
+gym-manager-frontend-apk/build/
+gym-manager-frontend-apk/.dart_tool/
+gym-manager-frontend-apk/.flutter-plugins
+gym-manager-frontend-apk/.flutter-plugins-dependencies
+gym-manager-frontend-apk/.packages
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
