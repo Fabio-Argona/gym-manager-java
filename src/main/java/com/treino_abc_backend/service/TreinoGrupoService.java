@@ -48,16 +48,16 @@ public class TreinoGrupoService {
     }
 
     public List<TreinoGrupoDTO> listarPorAluno(UUID alunoId) {
-        return grupoRepo.findByAluno_Id(alunoId).stream()
+        return grupoRepo.findByAluno_IdAndAtivoTrue(alunoId).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
     public void remover(UUID id) {
-        if (!grupoRepo.existsById(id)) {
-            throw new IllegalArgumentException("Grupo não encontrado para remoção");
-        }
-        grupoRepo.deleteById(id);
+        TreinoGrupo grupo = grupoRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado para remoção"));
+        grupo.setAtivo(false);
+        grupoRepo.save(grupo);
     }
 
     public TreinoGrupoDTO editar(UUID grupoId, TreinoGrupoDTO dto) {
@@ -100,10 +100,11 @@ public class TreinoGrupoService {
         }
         treinoAlunoRepo.saveAll(vinculadosAluno);
 
-        // 3. Excluir o grupo
+        // 3. Desativar o grupo (exclusão lógica)
         TreinoGrupo grupo = grupoRepo.findById(grupoId)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
-        grupoRepo.delete(grupo);
+        grupo.setAtivo(false);
+        grupoRepo.save(grupo);
     }
 
 
