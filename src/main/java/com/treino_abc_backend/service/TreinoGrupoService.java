@@ -3,11 +3,9 @@ package com.treino_abc_backend.service;
 import com.treino_abc_backend.dto.TreinoGrupoDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.entity.Exercicio;
-import com.treino_abc_backend.entity.TreinoExercicioAluno;
 import com.treino_abc_backend.entity.TreinoGrupo;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.repository.ExercicioRepository;
-import com.treino_abc_backend.repository.TreinoExercicioAlunoRepository;
 import com.treino_abc_backend.repository.TreinoGrupoRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,16 +19,12 @@ public class TreinoGrupoService {
 
     private final TreinoGrupoRepository grupoRepo;
     private final AlunoRepository alunoRepo;
-    private final TreinoExercicioAlunoRepository treinoAlunoRepo;
     private final ExercicioRepository exercicioRepo;
 
-
     public TreinoGrupoService(TreinoGrupoRepository grupoRepo, AlunoRepository alunoRepo,
-                               TreinoExercicioAlunoRepository treinoAlunoRepo,
                                ExercicioRepository exercicioRepo) {
         this.grupoRepo = grupoRepo;
         this.alunoRepo = alunoRepo;
-        this.treinoAlunoRepo = treinoAlunoRepo;
         this.exercicioRepo = exercicioRepo;
     }
 
@@ -93,14 +87,7 @@ public class TreinoGrupoService {
         }
         exercicioRepo.saveAll(exercicios);
 
-        // 2. Buscar vínculos de TreinoExercicioAluno e quebrar relação
-        List<TreinoExercicioAluno> vinculadosAluno = treinoAlunoRepo.findByGrupo_Id(grupoId);
-        for (TreinoExercicioAluno t : vinculadosAluno) {
-            t.setGrupo(null);
-        }
-        treinoAlunoRepo.saveAll(vinculadosAluno);
-
-        // 3. Desativar o grupo (exclusão lógica)
+        // 2. Desativar o grupo (exclusão lógica)
         TreinoGrupo grupo = grupoRepo.findById(grupoId)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
         grupo.setAtivo(false);
