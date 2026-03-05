@@ -32,9 +32,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/treino_abc
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       JWT_SECRET: ${JWT_SECRET}
-      APP_BASE_URL: ${APP_BASE_URL}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-update}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
 
     volumes:
       - ./uploads:/app/uploads

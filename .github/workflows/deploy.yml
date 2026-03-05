@@ -43,13 +43,8 @@ jobs:
           command_timeout: 10m
           script: |
             cd /home/ec2-user/gym-manager
-
-            cat > .env <<EOF
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            APP_BASE_URL=${{ secrets.APP_BASE_URL }}
-            DDL_AUTO=update
-            EOF
-
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+            echo "APP_BASE_URL=${{ secrets.APP_BASE_URL }}" >> .env
             docker compose down
             docker compose up --build -d
             docker image prune -f

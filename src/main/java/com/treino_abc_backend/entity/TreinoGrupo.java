@@ -17,6 +17,9 @@ public class TreinoGrupo {
     @Column(nullable = false)
     private String nome;
 
+    @Column(nullable = false, columnDefinition = "boolean not null default true")
+    private boolean ativo = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aluno_id", nullable = false)
     private Aluno aluno;
@@ -35,6 +38,14 @@ public class TreinoGrupo {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     public Aluno getAluno() {

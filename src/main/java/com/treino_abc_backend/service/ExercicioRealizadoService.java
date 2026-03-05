@@ -86,6 +86,7 @@ public class ExercicioRealizadoService {
                 exercicio.getId(),
                 exercicio.getExercicio().getId(),
                 nomeExercicio,
+                exercicio.getExercicio().getGrupoMuscular(),
                 exercicio.getSeriesRealizadas(),
                 exercicio.getRepeticoesRealizadas(),
                 exercicio.getPesoUtilizado(),
