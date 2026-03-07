@@ -8,8 +8,7 @@ services:
       POSTGRES_DB: treino_abc
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
+    # Porta 5432 NÃO exposta - backend acessa via rede Docker interna
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
