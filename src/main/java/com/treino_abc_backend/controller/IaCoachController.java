@@ -64,6 +64,28 @@ public class IaCoachController {
     }
 
     /**
+     * Gera análise automática do perfil do aluno (chamado ao abrir a aba IA Coach).
+     *
+     * GET /ia/analise/{alunoId}
+     * Header: Authorization: Bearer <token>
+     */
+    @GetMapping("/analise/{alunoId}")
+    public ResponseEntity<?> gerarAnalise(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable("alunoId") java.util.UUID alunoId) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(401).body(Map.of("erro", "Token de autenticação ausente ou inválido"));
+            }
+            String analise = iaCoachService.gerarAnalise(alunoId);
+            return ResponseEntity.ok(new IaRespostaDTO(analise));
+        } catch (RuntimeException e) {
+            System.err.println("[IaCoachController] Erro analise: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("erro", e.getMessage()));
+        }
+    }
+
+    /**
      * Endpoint de health check da IA (opcional, útil para debug).
      * GET /ia/status — público, não requer token.
      */
