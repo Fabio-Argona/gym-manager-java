@@ -1,5 +1,6 @@
 package com.treino_abc_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ public class EvolucaoMedidas {
     @Column(columnDefinition = "uuid", updatable = false)
     private UUID id;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate data;
     private Double peso;
     private Double percentualGordura;
