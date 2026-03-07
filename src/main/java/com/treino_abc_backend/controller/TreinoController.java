@@ -47,10 +47,7 @@ public class TreinoController {
         }
     }
 
-    /**
-     * Lista todas as sessões de treino de um aluno
-     * GET /treinos/realizado/aluno/{alunoId}
-     */
+
     @GetMapping("/realizado/aluno/{alunoId}")
     public ResponseEntity<List<Map<String, String>>> listarSessoesPorAluno(
             @PathVariable("alunoId") UUID alunoId
@@ -67,10 +64,6 @@ public class TreinoController {
         return ResponseEntity.ok(resultado);
     }
 
-    /**
-     * Busca a última sessão de um grupo específico
-     * GET /treinos/realizado/grupo/{grupoId}/ultima
-     */
     @GetMapping("/realizado/grupo/{grupoId}/ultima")
     public ResponseEntity<?> buscarUltimaSessao(@PathVariable("grupoId") UUID grupoId) {
         return realizadoService.buscarUltimaPorGrupo(grupoId)

@@ -20,17 +20,11 @@ public class ExercicioController {
         this.service = service;
     }
 
-    // ---------------------------------------------------------------
-    // LISTAR EXERCÍCIOS DO ALUNO
-    // ---------------------------------------------------------------
     @GetMapping
     public ResponseEntity<List<ExercicioDTO>> listar(@RequestHeader("aluno-id") String alunoId) {
         return ResponseEntity.ok(service.getPorAluno(UUID.fromString(alunoId)));
     }
 
-    // ---------------------------------------------------------------
-    // CRIAR NOVO EXERCÍCIO
-    // ---------------------------------------------------------------
     @PostMapping
     public ResponseEntity<ExercicioDTO> criar(@RequestHeader("aluno-id") String alunoId,
                                               @RequestBody ExercicioDTO dto) {
@@ -39,9 +33,6 @@ public class ExercicioController {
         return ResponseEntity.status(201).body(service.toDTO(salvo));
     }
 
-    // ---------------------------------------------------------------
-    // ATUALIZAR EXERCÍCIO EXISTENTE
-    // ---------------------------------------------------------------
     @PutMapping("/{id}")
     public ResponseEntity<ExercicioDTO> atualizar(@PathVariable("id") UUID id,
                                                   @RequestBody ExercicioEdicaoDTO dto,
@@ -50,9 +41,6 @@ public class ExercicioController {
         return ResponseEntity.ok(service.toDTO(atualizado));
     }
 
-    // ---------------------------------------------------------------
-    // DELETAR EXERCÍCIO
-    // ---------------------------------------------------------------
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@RequestHeader("aluno-id") String alunoId,
                                         @PathVariable("id") UUID id) {

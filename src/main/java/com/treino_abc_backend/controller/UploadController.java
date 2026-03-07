@@ -25,7 +25,6 @@ public class UploadController {
         this.uploadService = uploadService;
     }
 
-    // 📤 Upload da imagem do aluno
     @PostMapping("/upload/{id}")
     public ResponseEntity<String> uploadImagem(@RequestParam("foto") MultipartFile file, @PathVariable("id") String id) {
         try {
@@ -37,7 +36,6 @@ public class UploadController {
         }
     }
 
-    // 🖼️ Retorna a imagem para exibição no avatar
     @GetMapping("/uploads/{filename}")
     public ResponseEntity<Resource> getImagem(@PathVariable("filename") String filename) {
         try {

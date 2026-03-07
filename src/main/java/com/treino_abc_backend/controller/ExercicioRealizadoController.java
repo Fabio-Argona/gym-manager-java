@@ -21,10 +21,6 @@ public class ExercicioRealizadoController {
         this.exercicioRealizadoService = exercicioRealizadoService;
     }
 
-    /**
-     * Registra um exercício realizado pelo aluno
-     * POST /exercicios-realizados
-     */
     @PostMapping
     public ResponseEntity<ExercicioRealizadoDTO> registrarExercicio(@RequestBody RegistrarExercicioDTO dto) {
         try {
@@ -35,10 +31,6 @@ public class ExercicioRealizadoController {
         }
     }
 
-    /**
-     * Busca histórico de progressão de exercícios do aluno
-     * GET /exercicios-realizados/progressao?alunoId=UUID&exercicioId=UUID(opcional)&dataInicio=yyyy-MM-dd(opcional)&dataFim=yyyy-MM-dd(opcional)
-     */
     @GetMapping("/progressao")
     public ResponseEntity<List<ExercicioRealizadoDTO>> buscarProgressao(
             @RequestParam("alunoId") UUID alunoId,
