@@ -41,6 +41,30 @@ public class IaCoachService {
     }
 
     /**
+     * Gera uma análise automática do perfil do aluno ao abrir a aba IA Coach.
+     * Chamado pelo endpoint GET /ia/analise/{alunoId}.
+     *
+     * @param alunoId ID do aluno
+     * @return Análise personalizada gerada pelo Gemini
+     */
+    public String gerarAnalise(UUID alunoId) {
+        Aluno aluno = alunoRepository.findById(alunoId)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado: " + alunoId));
+
+        String promptAnalise = "Faça uma análise motivadora e personalizada do perfil deste aluno. "
+                + "Destaque os pontos positivos, sugira foco de treino com base no objetivo e nível, "
+                + "e dê uma dica prática para a semana. Seja direto e use no máximo 5 parágrafos curtos.";
+
+        String payload = montarPayloadSimples(aluno, promptAnalise);
+        String resposta = chamarGemini(payload);
+
+        // Salvar a análise no histórico
+        salvarMensagem(alunoId, "model", resposta);
+
+        return resposta;
+    }
+
+    /**
      * Processa a mensagem do aluno e retorna a resposta da IA.
      *
      * @param alunoId  ID do aluno autenticado
@@ -106,6 +130,24 @@ public class IaCoachService {
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao montar payload para Gemini: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Monta payload simples (sem histórico) para a análise inicial do perfil.
+     */
+    private String montarPayloadSimples(Aluno aluno, String prompt) {
+        try {
+            String systemInstruction = montarSystemPrompt(aluno);
+            return "{"
+                    + "\"system_instruction\":{\"parts\":[{\"text\":"
+                    + objectMapper.writeValueAsString(systemInstruction)
+                    + "}]},"
+                    + "\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":"
+                    + objectMapper.writeValueAsString(prompt)
+                    + "}]}]}";
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao montar payload simples: " + e.getMessage(), e);
         }
     }
 
