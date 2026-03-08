@@ -25,7 +25,7 @@ public class IaCoachService {
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
-    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=";
+    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
 
     private final AlunoRepository alunoRepository;
     private final IaMensagemRepository iaMensagemRepository;
