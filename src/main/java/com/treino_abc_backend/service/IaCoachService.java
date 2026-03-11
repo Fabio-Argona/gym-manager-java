@@ -2,15 +2,18 @@ package com.treino_abc_backend.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.treino_abc_backend.dto.IaRespostaDTO;
 import com.treino_abc_backend.entity.Aluno;
 import com.treino_abc_backend.entity.IaMensagem;
 import com.treino_abc_backend.repository.AlunoRepository;
 import com.treino_abc_backend.repository.IaMensagemRepository;
+import com.treino_abc_backend.repository.TreinoRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,15 +32,49 @@ public class IaCoachService {
 
     private final AlunoRepository alunoRepository;
     private final IaMensagemRepository iaMensagemRepository;
+    private final TreinoRepository treinoRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
     public IaCoachService(AlunoRepository alunoRepository,
-            IaMensagemRepository iaMensagemRepository) {
+            IaMensagemRepository iaMensagemRepository,
+            TreinoRepository treinoRepository) {
         this.alunoRepository = alunoRepository;
         this.iaMensagemRepository = iaMensagemRepository;
+        this.treinoRepository = treinoRepository;
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
+    }
+
+    /**
+     * Verifica se o aluno possui treinos e exercícios cadastrados.
+     * Caso não possua, retorna uma pergunta motivadora com opções de ação
+     * para o Flutter exibir botões interativos de escolha.
+     * Caso já possua treinos, retorna null e segue o fluxo normal de análise.
+     */
+    public IaRespostaDTO verificarInicioAluno(UUID alunoId) {
+        Aluno aluno = alunoRepository.findById(alunoId)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado: " + alunoId));
+
+        boolean possuiTreinos = treinoRepository.existsByAlunoId(alunoId);
+
+        if (!possuiTreinos) {
+            String nomeAluno = aluno.getNome() != null ? aluno.getNome().split(" ")[0] : "";
+            String pergunta = "Olá" + (nomeAluno.isBlank() ? "" : ", " + nomeAluno) + "! 👋\n\n"
+                    + "Percebi que você ainda não possui treinos cadastrados. "
+                    + "Que tal começarmos agora? 💪\n\n"
+                    + "O que você gostaria de fazer?";
+
+            List<String> opcoes = Arrays.asList(
+                    "Criar treino e exercícios",
+                    "Perguntar algo sobre o meu treino");
+
+            return new IaRespostaDTO(pergunta, true, opcoes);
+        }
+
+        // Aluno já possui treinos — retorna null para o controller seguir com a análise
+        // normal
+        return null;
     }
 
     /**

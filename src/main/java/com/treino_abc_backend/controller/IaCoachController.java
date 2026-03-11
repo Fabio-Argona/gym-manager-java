@@ -8,12 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
-/**
- * Controller do chat IA Coach.
- * Endpoint: POST /ia
- * Requer: Authorization: Bearer <token>
- */
 @RestController
 @RequestMapping("/ia")
 public class IaCoachController {
@@ -27,22 +23,48 @@ public class IaCoachController {
     }
 
     /**
-     * Recebe uma mensagem do aluno e retorna a resposta da IA Coach.
-     *
-     * Body JSON: { "alunoId": "uuid", "mensagem": "texto" }
-     * Header: Authorization: Bearer <token>
+     * Chamado pelo Flutter ao abrir a aba IA Coach.
+     * Verifica se o aluno possui treinos cadastrados:
+     * - Se NÃO possui → retorna pergunta motivadora com opções de ação
+     * (semTreinos=true, opcoes=["Criar treino e exercícios", "Perguntar algo sobre
+     * o meu treino"])
+     * - Se JÁ possui → retorna a análise normal do perfil via Groq
      */
+    @GetMapping("/iniciar/{alunoId}")
+    public ResponseEntity<?> iniciarConversa(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable("alunoId") UUID alunoId) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(401).body(Map.of("erro", "Token de autenticação ausente ou inválido"));
+            }
+
+            // Verifica se já tem treinos; se não tiver, retorna pergunta com opções
+            IaRespostaDTO respostaSemTreinos = iaCoachService.verificarInicioAluno(alunoId);
+            if (respostaSemTreinos != null) {
+                return ResponseEntity.ok(respostaSemTreinos);
+            }
+
+            // Aluno já tem treinos — gera análise normal do perfil
+            String analise = iaCoachService.gerarAnalise(alunoId);
+            return ResponseEntity.ok(new IaRespostaDTO(analise));
+
+        } catch (RuntimeException e) {
+            System.err.println("[IaCoachController] Erro iniciar: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("erro", e.getMessage()));
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> chat(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody IaMensagemRequestDTO request) {
         try {
-            // Validar presença do token
+
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return ResponseEntity.status(401).body(Map.of("erro", "Token de autenticação ausente ou inválido"));
             }
 
-            // Validar campos obrigatórios
             if (request.getAlunoId() == null) {
                 return ResponseEntity.badRequest().body(Map.of("erro", "alunoId é obrigatório"));
             }
@@ -63,16 +85,10 @@ public class IaCoachController {
         }
     }
 
-    /**
-     * Gera análise automática do perfil do aluno (chamado ao abrir a aba IA Coach).
-     *
-     * GET /ia/analise/{alunoId}
-     * Header: Authorization: Bearer <token>
-     */
     @GetMapping("/analise/{alunoId}")
     public ResponseEntity<?> gerarAnalise(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable("alunoId") java.util.UUID alunoId) {
+            @PathVariable("alunoId") UUID alunoId) {
         try {
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return ResponseEntity.status(401).body(Map.of("erro", "Token de autenticação ausente ou inválido"));
@@ -85,10 +101,6 @@ public class IaCoachController {
         }
     }
 
-    /**
-     * Endpoint de health check da IA (opcional, útil para debug).
-     * GET /ia/status — público, não requer token.
-     */
     @GetMapping("/status")
     public ResponseEntity<Map<String, String>> status() {
         return ResponseEntity.ok(Map.of("status", "IA Coach online"));
