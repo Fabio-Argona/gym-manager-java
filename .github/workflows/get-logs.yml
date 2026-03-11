@@ -1,7 +1,7 @@
 name: Get EC2 Logs
 
 on:
-  workflow_dispatch:
+  push:
 
 jobs:
   get-logs:
