@@ -12,20 +12,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
- * Serviço responsável por gerenciar a interação com a IA Coach (Gemini).
- * Mantém histórico de mensagens personalizado por aluno.
+ * Serviço responsável por gerenciar a interação com a IA Coach (Groq/Llama).
+ * Usa a API do Groq (compatível com OpenAI) — gratuita e com 14.400 req/dia.
  */
 @Service
 public class IaCoachService {
 
-    @Value("${gemini.api.key}")
-    private String geminiApiKey;
+    @Value("${groq.api.key}")
+    private String groqApiKey;
 
-    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+    private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+    private static final String GROQ_MODEL = "llama-3.3-70b-versatile";
 
     private final AlunoRepository alunoRepository;
     private final IaMensagemRepository iaMensagemRepository;
@@ -42,10 +42,6 @@ public class IaCoachService {
 
     /**
      * Gera uma análise automática do perfil do aluno ao abrir a aba IA Coach.
-     * Chamado pelo endpoint GET /ia/analise/{alunoId}.
-     *
-     * @param alunoId ID do aluno
-     * @return Análise personalizada gerada pelo Gemini
      */
     public String gerarAnalise(UUID alunoId) {
         Aluno aluno = alunoRepository.findById(alunoId)
@@ -56,103 +52,87 @@ public class IaCoachService {
                 + "e dê uma dica prática para a semana. Seja direto e use no máximo 5 parágrafos curtos.";
 
         String payload = montarPayloadSimples(aluno, promptAnalise);
-        String resposta = chamarGemini(payload);
-
-        // Salvar a análise no histórico
+        String resposta = chamarGroq(payload);
         salvarMensagem(alunoId, "model", resposta);
-
         return resposta;
     }
 
     /**
      * Processa a mensagem do aluno e retorna a resposta da IA.
-     *
-     * @param alunoId  ID do aluno autenticado
-     * @param mensagem Texto enviado pelo aluno
-     * @return Texto de resposta gerado pelo Gemini
      */
     public String processarMensagem(UUID alunoId, String mensagem) {
-        // 1. Buscar dados do aluno para contextualizar a IA
         Aluno aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado: " + alunoId));
 
-        // 2. Buscar histórico das últimas 10 mensagens (contexto da conversa)
         List<IaMensagem> historico = iaMensagemRepository
                 .findTop10ByAlunoIdOrderByCriadoEmAsc(alunoId);
 
-        // 3. Salvar a mensagem do usuário no histórico
         salvarMensagem(alunoId, "user", mensagem);
 
-        // 4. Montar o payload para o Gemini
         String payload = montarPayload(aluno, historico, mensagem);
-
-        // 5. Chamar API do Gemini
-        String respostaIA = chamarGemini(payload);
-
-        // 6. Salvar a resposta da IA no histórico
+        String respostaIA = chamarGroq(payload);
         salvarMensagem(alunoId, "model", respostaIA);
-
         return respostaIA;
     }
 
     /**
-     * Monta o JSON do payload para a API Gemini com o system prompt personalizado
-     * e o histórico de mensagens.
+     * Monta o payload no formato OpenAI/Groq com histórico de mensagens.
+     * {"model":"...","messages":[{"role":"system","content":"..."},{"role":"user","content":"..."},...]}
      */
     private String montarPayload(Aluno aluno, List<IaMensagem> historico, String novaMensagem) {
         try {
-            // System instruction com dados do aluno
-            String systemInstruction = montarSystemPrompt(aluno);
+            String systemPrompt = montarSystemPrompt(aluno);
+            StringBuilder messages = new StringBuilder("[");
 
-            // Construir array de "contents" com histórico + nova mensagem
-            StringBuilder contentsBuilder = new StringBuilder("[");
+            // System message
+            messages.append("{\"role\":\"system\",\"content\":")
+                    .append(objectMapper.writeValueAsString(systemPrompt))
+                    .append("}");
 
+            // Histórico de mensagens (user/assistant)
             for (IaMensagem msg : historico) {
-                contentsBuilder.append("{")
-                        .append("\"role\":\"").append(msg.getRole()).append("\",")
-                        .append("\"parts\":[{\"text\":").append(objectMapper.writeValueAsString(msg.getConteudo()))
-                        .append("}]")
-                        .append("},");
+                // Groq usa "assistant" em vez de "model"
+                String role = "model".equals(msg.getRole()) ? "assistant" : "user";
+                messages.append(",{\"role\":\"").append(role).append("\",\"content\":")
+                        .append(objectMapper.writeValueAsString(msg.getConteudo()))
+                        .append("}");
             }
 
-            // Adicionar a nova mensagem do usuário
-            contentsBuilder.append("{")
-                    .append("\"role\":\"user\",")
-                    .append("\"parts\":[{\"text\":").append(objectMapper.writeValueAsString(novaMensagem)).append("}]")
+            // Nova mensagem do usuário
+            messages.append(",{\"role\":\"user\",\"content\":")
+                    .append(objectMapper.writeValueAsString(novaMensagem))
                     .append("}]");
 
-            return "{"
-                    + "\"system_instruction\":{\"parts\":[{\"text\":"
-                    + objectMapper.writeValueAsString(systemInstruction)
-                    + "}]},"
-                    + "\"contents\":" + contentsBuilder
-                    + "}";
+            return "{\"model\":\"" + GROQ_MODEL + "\","
+                    + "\"messages\":" + messages + ","
+                    + "\"temperature\":0.7,"
+                    + "\"max_tokens\":1024}";
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao montar payload para Gemini: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao montar payload para Groq: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Monta payload simples (sem histórico) para a análise inicial do perfil.
+     * Monta payload simples (sem histórico) para análise inicial do perfil.
      */
     private String montarPayloadSimples(Aluno aluno, String prompt) {
         try {
-            String systemInstruction = montarSystemPrompt(aluno);
-            return "{"
-                    + "\"system_instruction\":{\"parts\":[{\"text\":"
-                    + objectMapper.writeValueAsString(systemInstruction)
-                    + "}]},"
-                    + "\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":"
-                    + objectMapper.writeValueAsString(prompt)
-                    + "}]}]}";
+            String systemPrompt = montarSystemPrompt(aluno);
+            return "{\"model\":\"" + GROQ_MODEL + "\","
+                    + "\"messages\":["
+                    + "{\"role\":\"system\",\"content\":" + objectMapper.writeValueAsString(systemPrompt) + "},"
+                    + "{\"role\":\"user\",\"content\":" + objectMapper.writeValueAsString(prompt) + "}"
+                    + "],"
+                    + "\"temperature\":0.7,"
+                    + "\"max_tokens\":1024}";
         } catch (Exception e) {
             throw new RuntimeException("Erro ao montar payload simples: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Cria o system prompt personalizado com os dados físicos e objetivos do aluno.
+     * Cria o system prompt personalizado com os dados do aluno.
      */
     private String montarSystemPrompt(Aluno aluno) {
         StringBuilder sb = new StringBuilder();
@@ -162,74 +142,63 @@ public class IaCoachService {
         sb.append("=== DADOS DO ALUNO ===\n");
         sb.append("Nome: ").append(aluno.getNome() != null ? aluno.getNome() : "Não informado").append("\n");
 
-        if (aluno.getObjetivo() != null && !aluno.getObjetivo().isBlank()) {
+        if (aluno.getObjetivo() != null && !aluno.getObjetivo().isBlank())
             sb.append("Objetivo: ").append(aluno.getObjetivo()).append("\n");
-        }
-        if (aluno.getNivelTreinamento() != null && !aluno.getNivelTreinamento().isBlank()) {
-            sb.append("Nível de treinamento: ").append(aluno.getNivelTreinamento()).append("\n");
-        }
-        if (aluno.getSexo() != null) {
+        if (aluno.getNivelTreinamento() != null && !aluno.getNivelTreinamento().isBlank())
+            sb.append("Nível: ").append(aluno.getNivelTreinamento()).append("\n");
+        if (aluno.getSexo() != null)
             sb.append("Sexo: ").append(aluno.getSexo()).append("\n");
-        }
-        if (aluno.getPesoAtual() != null) {
-            sb.append("Peso atual: ").append(aluno.getPesoAtual()).append(" kg\n");
-        }
-        if (aluno.getAltura() != null) {
+        if (aluno.getPesoAtual() != null)
+            sb.append("Peso: ").append(aluno.getPesoAtual()).append(" kg\n");
+        if (aluno.getAltura() != null)
             sb.append("Altura: ").append(aluno.getAltura()).append(" m\n");
-        }
-        if (aluno.getImc() != null) {
+        if (aluno.getImc() != null)
             sb.append("IMC: ").append(String.format("%.1f", aluno.getImc())).append("\n");
-        }
-        if (aluno.getPercentualGordura() != null) {
+        if (aluno.getPercentualGordura() != null)
             sb.append("% Gordura: ").append(aluno.getPercentualGordura()).append("%\n");
-        }
-        if (aluno.getPercentualMusculo() != null) {
+        if (aluno.getPercentualMusculo() != null)
             sb.append("% Músculo: ").append(aluno.getPercentualMusculo()).append("%\n");
-        }
 
         sb.append("=====================\n\n");
         sb.append("Use esses dados para personalizar suas respostas. ");
         sb.append("Responda apenas perguntas relacionadas a fitness, saúde, treino, nutrição e bem-estar.");
-
         return sb.toString();
     }
 
     /**
-     * Faz a chamada HTTP para a API do Gemini e retorna o texto da resposta.
+     * Faz a chamada HTTP para a API do Groq e retorna o texto da resposta.
+     * Formato de resposta: choices[0].message.content
      */
-    private String chamarGemini(String payloadJson) {
+    private String chamarGroq(String payloadJson) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(groqApiKey);
 
             HttpEntity<String> requestEntity = new HttpEntity<>(payloadJson, headers);
 
-            String url = GEMINI_URL + geminiApiKey;
-
             ResponseEntity<String> response = restTemplate.exchange(
-                    url,
+                    GROQ_URL,
                     HttpMethod.POST,
                     requestEntity,
                     String.class);
 
-            // Parsear resposta JSON do Gemini
+            // Parsear resposta: choices[0].message.content
             JsonNode root = objectMapper.readTree(response.getBody());
             String texto = root
-                    .path("candidates").get(0)
+                    .path("choices").get(0)
+                    .path("message")
                     .path("content")
-                    .path("parts").get(0)
-                    .path("text")
                     .asText();
 
             if (texto == null || texto.isBlank()) {
-                throw new RuntimeException("Resposta vazia do Gemini");
+                throw new RuntimeException("Resposta vazia da IA");
             }
 
             return texto;
 
         } catch (Exception e) {
-            // Log e retorno de mensagem amigável em caso de erro
-            System.err.println("[IaCoachService] Erro ao chamar Gemini: " + e.getMessage());
+            System.err.println("[IaCoachService] Erro ao chamar Groq: " + e.getMessage());
             throw new RuntimeException("Não foi possível obter resposta da IA. Tente novamente.", e);
         }
     }
