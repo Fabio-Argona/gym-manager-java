@@ -22,14 +22,6 @@ public class IaCoachController {
         this.jwtUtil = jwtUtil;
     }
 
-    /**
-     * Chamado pelo Flutter ao abrir a aba IA Coach.
-     * Verifica se o aluno possui treinos cadastrados:
-     * - Se NÃO possui → retorna pergunta motivadora com opções de ação
-     * (semTreinos=true, opcoes=["Criar treino e exercícios", "Perguntar algo sobre
-     * o meu treino"])
-     * - Se JÁ possui → retorna a análise normal do perfil via Groq
-     */
     @GetMapping("/iniciar/{alunoId}")
     public ResponseEntity<?> iniciarConversa(
             @RequestHeader("Authorization") String authHeader,
@@ -49,9 +41,11 @@ public class IaCoachController {
             String analise = iaCoachService.gerarAnalise(alunoId);
             return ResponseEntity.ok(new IaRespostaDTO(analise));
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("[IaCoachController] Erro iniciar: " + e.getMessage());
-            return ResponseEntity.status(500).body(Map.of("erro", e.getMessage()));
+            String erroMsg = e.getMessage() != null ? e.getMessage() : e.toString();
+            return ResponseEntity.status(500).body(Map.of("erro", erroMsg));
         }
     }
 
@@ -79,9 +73,11 @@ public class IaCoachController {
 
             return ResponseEntity.ok(new IaRespostaDTO(respostaIA));
 
-        } catch (RuntimeException e) {
-            System.err.println("[IaCoachController] Erro: " + e.getMessage());
-            return ResponseEntity.status(500).body(Map.of("erro", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("[IaCoachController] Erro chat: " + e.getMessage());
+            String erroMsg = e.getMessage() != null ? e.getMessage() : e.toString();
+            return ResponseEntity.status(500).body(Map.of("erro", erroMsg));
         }
     }
 
@@ -95,9 +91,11 @@ public class IaCoachController {
             }
             String analise = iaCoachService.gerarAnalise(alunoId);
             return ResponseEntity.ok(new IaRespostaDTO(analise));
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("[IaCoachController] Erro analise: " + e.getMessage());
-            return ResponseEntity.status(500).body(Map.of("erro", e.getMessage()));
+            String erroMsg = e.getMessage() != null ? e.getMessage() : e.toString();
+            return ResponseEntity.status(500).body(Map.of("erro", erroMsg));
         }
     }
 
