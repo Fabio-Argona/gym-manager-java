@@ -12,7 +12,7 @@ public interface IaMensagemRepository extends JpaRepository<IaMensagem, UUID> {
 
     /**
      * Retorna as últimas 10 mensagens do aluno em ordem cronológica,
-     * para ser usado como contexto no prompt do Gemini.
+     * para ser usado como contexto no prompt do Groq (Llama 3.3).
      */
     List<IaMensagem> findTop10ByAlunoIdOrderByCriadoEmAsc(UUID alunoId);
 }
