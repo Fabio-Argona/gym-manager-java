@@ -38,8 +38,8 @@ public class IaCoachController {
             }
 
             // Aluno já tem treinos — gera análise normal do perfil
-            String analise = iaCoachService.gerarAnalise(alunoId);
-            return ResponseEntity.ok(new IaRespostaDTO(analise));
+            IaRespostaDTO analise = iaCoachService.gerarAnalise(alunoId);
+            return ResponseEntity.ok(analise);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,11 +67,11 @@ public class IaCoachController {
             }
 
             // Processar mensagem e obter resposta da IA
-            String respostaIA = iaCoachService.processarMensagem(
+            IaRespostaDTO respostaDTO = iaCoachService.processarMensagem(
                     request.getAlunoId(),
                     request.getMensagem());
 
-            return ResponseEntity.ok(new IaRespostaDTO(respostaIA));
+            return ResponseEntity.ok(respostaDTO);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,8 +89,8 @@ public class IaCoachController {
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return ResponseEntity.status(401).body(Map.of("erro", "Token de autenticação ausente ou inválido"));
             }
-            String analise = iaCoachService.gerarAnalise(alunoId);
-            return ResponseEntity.ok(new IaRespostaDTO(analise));
+            IaRespostaDTO analise = iaCoachService.gerarAnalise(alunoId);
+            return ResponseEntity.ok(analise);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("[IaCoachController] Erro analise: " + e.getMessage());
