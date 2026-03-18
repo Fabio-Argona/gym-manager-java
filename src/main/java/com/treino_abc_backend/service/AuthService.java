@@ -78,6 +78,7 @@ public class AuthService {
         dto.setTelefone(aluno.getTelefone());
         dto.setDataNascimento(aluno.getDataNascimento());
         dto.setLogin(aluno.getLogin());
+        dto.setRole(aluno.getRole());
         return dto;
     }
 }
