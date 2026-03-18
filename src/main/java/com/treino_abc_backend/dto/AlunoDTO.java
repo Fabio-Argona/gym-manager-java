@@ -53,6 +53,7 @@ public class AlunoDTO {
 
     private String objetivo;           // Ex.: "Hipertrofia", "Emagrecimento", "Resistência"
     private String nivelTreinamento;   // Ex.: "Iniciante", "Intermediário", "Avançado"
+    private String role;               // Ex.: "ROLE_ADMIN", "ROLE_USER"
 
     // ======= HISTÓRICO DE EVOLUÇÃO =======
 
@@ -182,6 +183,11 @@ public class AlunoDTO {
     public String getNivelTreinamento() { return nivelTreinamento; }
 
     public void setNivelTreinamento(String nivelTreinamento) { this.nivelTreinamento = nivelTreinamento; }
+
+    // Role
+    public String getRole() { return role; }
+
+    public void setRole(String role) { this.role = role; }
 
     // Histórico
     public List<EvolucaoMedidasDTO> getHistoricoEvolucao() { return historicoEvolucao; }

@@ -57,6 +57,7 @@ public class AlunoService {
         dto.setImc(aluno.getImc());
         dto.setObjetivo(aluno.getObjetivo());
         dto.setNivelTreinamento(aluno.getNivelTreinamento());
+        dto.setRole(aluno.getRole());
         return dto;
     }
 
