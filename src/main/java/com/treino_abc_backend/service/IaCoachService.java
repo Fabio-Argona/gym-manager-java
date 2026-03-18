@@ -98,46 +98,79 @@ public class IaCoachService {
      * Gera uma análise automática do perfil do aluno ao abrir a aba IA Coach.
      */
     public IaRespostaDTO gerarAnalise(UUID alunoId) {
-        Aluno aluno = alunoRepository.findById(alunoId)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado: " + alunoId));
+        try {
+            Aluno aluno = alunoRepository.findById(alunoId)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Aluno não encontrado: " + alunoId));
 
-        String promptAnalise = "Faça uma análise motivadora e personalizada do perfil deste aluno. "
+            String promptAnalise = "Faça uma análise motivadora e personalizada do perfil deste aluno. "
                 + "Destaque os pontos positivos, sugira foco de treino com base no objetivo e nível, "
                 + "e dê uma dica prática para a semana. Seja direto e use no máximo 5 parágrafos curtos.";
 
-        String payload = montarPayloadSimples(aluno, promptAnalise);
-        String resposta = chamarGroq(payload);
+            String payload = montarPayloadSimples(aluno, promptAnalise);
+            System.out.println("[IaCoachService] Payload para Groq: " + payload);
+            String resposta = chamarGroq(payload);
             if (resposta == null || resposta.trim().isEmpty()) {
-                throw new RuntimeException("Resposta vazia da IA");
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
+                "Resposta vazia da IA");
             }
 
-        IaRespostaDTO respostaDTO = extrairJsonDaResposta(aluno, resposta);
+            System.out.println("[IaCoachService] Resposta da Groq: " + resposta);
+            IaRespostaDTO respostaDTO = extrairJsonDaResposta(aluno, resposta);
 
-        salvarMensagem(alunoId, "model", respostaDTO.getResposta());
+            salvarMensagem(alunoId, "model", respostaDTO.getResposta());
 
-        return respostaDTO;
+            return respostaDTO;
+        } catch (org.springframework.web.server.ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            System.err.println("[IaCoachService] Erro em gerarAnalise: " + e.getMessage());
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
+                "Erro ao gerar análise: " + e.getMessage(), e);
+        }
     }
 
     /**
      * Processa a mensagem do aluno e retorna a resposta da IA.
      */
     public IaRespostaDTO processarMensagem(UUID alunoId, String mensagem) {
-        Aluno aluno = alunoRepository.findById(alunoId)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado: " + alunoId));
+        try {
+            Aluno aluno = alunoRepository.findById(alunoId)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Aluno não encontrado: " + alunoId));
 
-        List<IaMensagem> historico = iaMensagemRepository
+            List<IaMensagem> historico = iaMensagemRepository
                 .findTop10ByAlunoIdOrderByCriadoEmAsc(alunoId);
 
-        salvarMensagem(alunoId, "user", mensagem);
+            salvarMensagem(alunoId, "user", mensagem);
 
-        String payload = montarPayload(aluno, historico, mensagem);
-        String respostaIA = chamarGroq(payload);
+            String payload = montarPayload(aluno, historico, mensagem);
+            System.out.println("[IaCoachService] Payload para Groq: " + payload);
+            String respostaIA = chamarGroq(payload);
+            if (respostaIA == null || respostaIA.trim().isEmpty()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
+                "Resposta vazia da IA");
+            }
+            System.out.println("[IaCoachService] Resposta da Groq: " + respostaIA);
 
-        // Extrai o JSON e salva os treinos no banco de dados se for o caso
-        IaRespostaDTO respostaDTO = extrairJsonDaResposta(aluno, respostaIA);
+            // Extrai o JSON e salva os treinos no banco de dados se for o caso
+            IaRespostaDTO respostaDTO = extrairJsonDaResposta(aluno, respostaIA);
 
-        salvarMensagem(alunoId, "model", respostaDTO.getResposta());
-        return respostaDTO;
+            salvarMensagem(alunoId, "model", respostaDTO.getResposta());
+            return respostaDTO;
+        } catch (org.springframework.web.server.ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            System.err.println("[IaCoachService] Erro em processarMensagem: " + e.getMessage());
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
+                "Erro ao processar mensagem: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -467,7 +500,7 @@ public class IaCoachService {
                     requestEntity,
                     String.class);
 
-            // Parsear resposta: choices[0].message.content
+            System.out.println("[IaCoachService] Resposta bruta da Groq: " + response.getBody());
             JsonNode root = objectMapper.readTree(response.getBody());
             String texto = root
                     .path("choices").get(0)
@@ -476,14 +509,20 @@ public class IaCoachService {
                     .asText();
 
             if (texto == null || texto.isBlank()) {
-                throw new RuntimeException("Resposta vazia da IA");
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Resposta vazia da IA");
             }
 
             return texto;
 
+        } catch (org.springframework.web.server.ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
             System.err.println("[IaCoachService] Erro ao chamar Groq: " + e.getMessage());
-            throw new RuntimeException("Não foi possível obter resposta da IA. Tente novamente.", e);
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Não foi possível obter resposta da IA. Tente novamente.", e);
         }
     }
 
