@@ -33,7 +33,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOriginPatterns(List.of("*"));
 
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "HEAD", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L); // Cache da pré-verificação CORS
@@ -71,7 +71,7 @@ public class SecurityConfig {
 
 
                 ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/uploads/**").permitAll()
+                        .requestMatchers("/api/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/grupos/**").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/exercicios/*/status").permitAll()
 
